@@ -1,9 +1,10 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router.ts'
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router.ts';
+import { CalendarCore } from './wasm/core-wrapper.ts';
 
-const app = createApp(App)
+await CalendarCore.setCorsProxy('http://localhost:8000');
 
-app.use(router)
-
-app.mount('#app')
+const app = createApp(App);
+app.use(router);
+app.mount('#app');

@@ -1,4 +1,4 @@
-import type { CalendarEvent } from '../types/core';
+import type { CalendarEvent } from '@/types/core';
 
 const worker = new Worker(new URL('worker.ts', import.meta.url), { type: 'module' });
 
@@ -14,8 +14,8 @@ worker.onmessage = (e: MessageEvent) => {
   else handlers.resolve(result);
 };
 
-function call(method: string, args: any[] = []) {
-  return new Promise<any>((resolve, reject) => {
+function call<T>(method: string, args: any[] = []): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
     const id = idCounter++;
     pending.set(id, { resolve, reject });
     worker.postMessage({ id, method, args });
@@ -24,11 +24,15 @@ function call(method: string, args: any[] = []) {
 
 // singleton object
 export const CalendarCore = {
-  addEvent: (event: CalendarEvent) => call('addEvent', [event]),
-  updateEvent: (event: CalendarEvent) => call('updateEvent', [event]),
-  removeEvent: (event: CalendarEvent) => call('removeEvent', [event]),
-  getEvent: (id: number) => call('getEvent', [id]),
-  getEvents: (from: number, to: number) => call('getEvents', [from, to]),
-  setCorsProxy: (proxy: string) => call('setCorsProxy', [proxy]),
-  clone: (url: string) => call('clone', [url]),
+  initialize: (): Promise<void> => call<void>('initialize'),
+  clone: (url: string): Promise<void> => call<void>('clone', [url]),
+  delete: (): Promise<void> => call<void>('delete'),
+
+  setCorsProxy: (proxy: string): Promise<boolean> => call<boolean>('setCorsProxy', [proxy]),
+
+  addEvent: (event: CalendarEvent): Promise<void> => call<void>('addEvent', [event]),
+  updateEvent: (event: CalendarEvent): Promise<void> => call<void>('updateEvent', [event]),
+  removeEvent: (event: CalendarEvent): Promise<void> => call<void>('removeEvent', [event]),
+  getEvent: (id: number): Promise<CalendarEvent> => call<CalendarEvent>('getEvent', [id]),
+  getEvents: (from: number, to: number): Promise<CalendarEvent[]> => call<CalendarEvent[]>('getEvents', [from, to]),
 };

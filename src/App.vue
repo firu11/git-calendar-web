@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import NavBar from './components/NavBar.vue';
+import SideBar from './components/SideBar.vue';
 </script>
 
 <template>
   <NavBar />
+  <SideBar />
   <main>
     <RouterView />
   </main>
@@ -11,6 +13,7 @@ import NavBar from './components/NavBar.vue';
 
 <style scoped>
 main {
+  height: 100%;
   grid-area: main;
 }
 </style>

@@ -9,9 +9,11 @@
     "src/**/__tests__/*"
   ],
   "compilerOptions": {
+    "noUnusedLocals": true, // detects unused variables and imports
+    "noUnusedParameters": true, // detects unused function parameters
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "paths": {
-      "@/*": [
+      "@/*": [ // defines the '@/.' path
         "./src/*"
       ]
     }

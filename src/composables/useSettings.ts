@@ -1,15 +1,17 @@
 import { useStorage } from '@vueuse/core';
 import { watch } from 'vue';
+import { languages } from '@/constants.ts';
 
 export function useSettings() {
-  return {
-    settings,
-  };
+  return { settings };
 }
 
 type Theme = 'auto' | 'light' | 'dark';
+type Lang = (typeof languages)[number]['code'];
+
 type UserSettings = {
   theme: Theme;
+  language: Lang;
   dayViewStartHour: number;
   dayViewEndHour: number;
 };
@@ -17,6 +19,7 @@ type UserSettings = {
 // default settings
 const settings = useStorage<UserSettings>('user-settings', {
   theme: 'auto',
+  language: 'en',
   dayViewStartHour: 6,
   dayViewEndHour: 24,
 });

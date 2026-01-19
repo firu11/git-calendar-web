@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { CalendarEvent } from '@/types/core';
 import { CalendarCore } from '@/wasm/core-wrapper';
 import { onMounted } from 'vue';
 

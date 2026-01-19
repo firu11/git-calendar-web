@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import WeekView from '@/components/WeekView.vue';
+import WeekView from '@/views/WeekView.vue';
 import TestWasm from '@/views/TestWasm.vue';
 
 const router = createRouter({

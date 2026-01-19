@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import DayTimeline from '@/components/DayTimeline.vue';
 import { computed, onMounted } from 'vue';
-import type { CalendarEvent } from '@/types/core';
+import type { CalendarEvent } from '@/types/core.ts';
+import { useSettings } from '@/composables/useSettings';
+
+const { settings } = useSettings();
 
 interface Props {
   startDate?: Date;
@@ -86,6 +89,10 @@ const weekDates = computed(() => {
   });
 });
 
+const numOfHoursOnGrid = computed(() => {
+  return settings.value.dayViewEndHour - settings.value.dayViewStartHour;
+});
+
 onMounted(() => {
   let events = fakeGetEvents();
   console.table(events);
@@ -94,7 +101,12 @@ onMounted(() => {
 
 <template>
   <div id="week-view-container">
-    <DayTimeline v-for="d in weekDates" :date="d" />
+    <DayTimeline
+      v-for="d in weekDates"
+      :date="d"
+      :numOfHours="numOfHoursOnGrid"
+      :events="fakeGetEvents()"
+    />
   </div>
 </template>
 
@@ -102,6 +114,8 @@ onMounted(() => {
 #week-view-container {
   display: grid;
   grid-auto-flow: column;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 1rem;
 
   /*grid-template-rows: 100%;
   grid-template-columns: 1fr;*/

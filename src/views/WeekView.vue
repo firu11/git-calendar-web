@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { computed, onMounted, ref } from 'vue';
 import DayTimeline from '@/components/DayTimeline.vue';
-import { computed, onMounted } from 'vue';
 import type { CalendarEvent } from '@/types/core.ts';
 import { useSettings } from '@/composables/useSettings';
 
@@ -28,55 +28,30 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 function fakeGetEvents(): CalendarEvent[] {
+  const now = new Date();
+
   return [
     {
       id: 1,
-      title: 'Monday Morning Standup',
+      title:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.",
       location: 'Meeting Room A',
-      from: 29462820,
-      to: 29462850,
+      from: new Date(new Date(now).setHours(12, 0, 0, 0)),
+      to: new Date(new Date(now).setHours(15, 0, 0, 0)),
     },
     {
       id: 2,
       title: 'Tuesday Gym Session',
       location: 'Fitness Center',
-      from: 29464320,
-      to: 29464410,
+      from: new Date(new Date(new Date(now).setDate(now.getDate() + 1)).setHours(8, 0, 0, 0)),
+      to: new Date(new Date(new Date(now).setDate(now.getDate() + 1)).setHours(10, 0, 0, 0)),
     },
     {
       id: 3,
       title: 'Wednesday Deep Work',
       location: 'Home Office',
-      from: 29465700,
-      to: 29465880,
-    },
-    {
-      id: 4,
-      title: 'Wednesday Lunch Meeting (OVERLAP)',
-      location: 'Cafe Deluxe',
-      from: 29465820,
-      to: 29465880,
-    },
-    {
-      id: 5,
-      title: 'Thursday Project Review',
-      location: 'Zoom',
-      from: 29467260,
-      to: 29467320,
-    },
-    {
-      id: 6,
-      title: 'Friday Happy Hour',
-      location: 'The Local Pub',
-      from: 29468760,
-      to: 29468880,
-    },
-    {
-      id: 7,
-      title: 'Saturday Hiking',
-      location: 'National Park',
-      from: 29469900,
-      to: 29470260,
+      from: new Date(new Date(new Date(now).setDate(now.getDate() + 1)).setHours(8, 30, 0, 0)),
+      to: new Date(new Date(new Date(now).setDate(now.getDate() + 1)).setHours(10, 30, 0, 0)),
     },
   ];
 }
@@ -93,19 +68,35 @@ const numOfHoursOnGrid = computed(() => {
   return settings.value.dayViewEndHour - settings.value.dayViewStartHour;
 });
 
+function getDateOnly(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+const eventsByDay = ref<CalendarEvent[][]>(Array.from({ length: 7 }, () => []));
+
 onMounted(() => {
-  let events = fakeGetEvents();
-  console.table(events);
+  const events = fakeGetEvents();
+  for (const event of events) {
+    const eventDate = getDateOnly(event.from);
+
+    const dayIndex = Math.floor(
+      (eventDate.getTime() - props.startDate.getTime()) / (1000 * 60 * 60 * 24),
+    );
+
+    if (dayIndex >= 0 && dayIndex < 7) {
+      eventsByDay.value[dayIndex]?.push(event);
+    }
+  }
 });
 </script>
 
 <template>
   <div id="week-view-container">
     <DayTimeline
-      v-for="d in weekDates"
+      v-for="(d, i) in weekDates"
       :date="d"
       :numOfHours="numOfHoursOnGrid"
-      :events="fakeGetEvents()"
+      :events="eventsByDay[i]!"
     />
   </div>
 </template>

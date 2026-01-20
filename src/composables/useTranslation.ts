@@ -2,7 +2,7 @@
 
 import { watch } from 'vue';
 import { createI18n } from 'vue-i18n';
-import { languages } from '@/constants.ts';
+import type { languages } from '@/constants.ts';
 import { useSettings } from '@/composables/useSettings.ts'; // init settings
 
 const { settings } = useSettings();
@@ -32,6 +32,12 @@ watch(
   },
 );
 
+function dayName(date: Date): string {
+  return new Intl.DateTimeFormat(settings.value.language, { weekday: 'short' })
+    .format(date)
+    .toLowerCase();
+}
+
 export function useTranslation() {
-  return { i18n };
+  return { i18n, dayName };
 }

@@ -11,7 +11,7 @@ onMounted(async () => {
   <button @click="CalendarCore.initialize()">Init</button>
   <button @click="CalendarCore.delete()">Delete</button>
   <button @click="CalendarCore.clone('https://github.com/firu11/personal-web')">Clone</button>
-  <button @click="CalendarCore.addEvent({ id: 1, from: 1, to: 2, title: 'Meeting', location: '' })">
+  <button @click="CalendarCore.addEvent({ id: 1, from: new Date(), to: new Date(), title: 'Meeting', location: '' })">
     Add Event
   </button>
 </template>

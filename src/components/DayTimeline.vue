@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useSettings } from '@/composables/useSettings.ts';
 import type { CalendarEvent } from '@/types/core.ts';
-
-const { settings } = useSettings();
 
 interface Props {
   date: Date;
@@ -12,14 +9,8 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const dayName = computed(() => {
-  return new Intl.DateTimeFormat(settings.value.language, { weekday: 'short' })
-    .format(props.date)
-    .toLowerCase();
-});
-
 // Convert a Date to a fraction of the timeline (0..1)
-const getEventPosition = (event: CalendarEvent) => {
+function getEventPosition(event: CalendarEvent) {
   const dayStart = new Date(props.date);
   dayStart.setHours(0, 0, 0, 0);
 
@@ -30,33 +21,55 @@ const getEventPosition = (event: CalendarEvent) => {
   const end = Math.min(1, eventEndHours / props.numOfHours);
 
   return { start, end };
-};
+}
 
 function getEventStylePos(e: CalendarEvent) {
   const pos = getEventPosition(e);
   return {
-    top: pos.start * 100 + '%',
-    height: (pos.end - pos.start) * 100 + '%',
+    top: `${pos.start * 100}%`,
+    height: `${(pos.end - pos.start) * 100}%`,
   };
 }
+
+// expects events to be sorted by "from" beforehand in Wasm
+const nonoverlappingGroups = computed(() => {
+  if (!props.events || props.events.length === 0) return [];
+
+  // each inner array is a lane/timeline
+  const lanes: CalendarEvent[][] = [];
+
+  for (const event of props.events) {
+    let placed = false;
+
+    // try to find an existing lane where this event fits
+    for (const lane of lanes) {
+      const lastEventInLane = lane[lane.length - 1]!;
+
+      // if the event starts after (or when) the last event in this lane ends
+      if (event.from.getTime() >= lastEventInLane.to.getTime()) {
+        lane.push(event);
+        placed = true;
+        break;
+      }
+    }
+
+    // if it overlapped with the end of every existing lane, create a new lane
+    if (!placed) {
+      lanes.push([event]);
+    }
+  }
+
+  return lanes;
+});
 </script>
 
 <template>
   <div class="day-timeline">
-    <span class="day-label">{{ dayName }}</span>
-
     <div class="timeline-grid">
-      <div class="hour-lines">
-        <div
-          v-for="hour in numOfHours"
-          :key="hour"
-          class="hour-line"
-          :style="{ top: (hour / numOfHours) * 100 + '%' }"
-        ></div>
-      </div>
-
-      <div v-for="e in events" :key="e.id" class="timeline-event" :style="getEventStylePos(e)">
-        {{ e.title }}
+      <div class="timeline-group" v-for="g in nonoverlappingGroups">
+        <div v-for="e in g" :key="e.id" class="timeline-event" :style="getEventStylePos(e)">
+          {{ e.title }}
+        </div>
       </div>
     </div>
   </div>
@@ -64,31 +77,20 @@ function getEventStylePos(e: CalendarEvent) {
 
 <style scoped>
 .day-timeline {
+  border-left: var(--grid-border);
   position: relative;
 }
 
 .timeline-grid {
   position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 0.5rem;
   height: 30rem;
-  width: 100%;
 }
 
-.hour-lines {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none; /* allow clicking events */
-}
-
-.hour-line {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--text-color);
-  opacity: 0.2;
+.timeline-group {
+  position: relative;
 }
 
 .timeline-event {

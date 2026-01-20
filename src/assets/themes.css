@@ -1,14 +1,20 @@
 :root, /* default */
 [data-theme='dark'] {
   --bg-color: #242424;
+  --text-color: #ffffff;
+
   --navbar-color: #3d3d3d;
   --sidebar-color: #363636;
-  --text-color: #ffffff;
+
+  --grid-color: #363636;
+  --grid-thickness: 1px;
+  --grid-border: var(--grid-thickness) solid var(--grid-color);
 }
 
 [data-theme='light'] {
   --bg-color: #f2f2f2;
+  --text-color: #101010;
+
   --navbar-color: #d4d4d4;
   --sidebar-color: #d4d4d4;
-  --text-color: #101010;
 }

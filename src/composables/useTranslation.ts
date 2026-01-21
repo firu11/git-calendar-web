@@ -4,6 +4,7 @@ import { watch } from 'vue';
 import { createI18n } from 'vue-i18n';
 import type { languages } from '@/constants.ts';
 import { useSettings } from '@/composables/useSettings.ts'; // init settings
+import type { DateTime } from 'luxon';
 
 const { settings } = useSettings();
 type LocaleCode = (typeof languages)[number]['code'];
@@ -32,10 +33,8 @@ watch(
   },
 );
 
-function dayName(date: Date): string {
-  return new Intl.DateTimeFormat(settings.value.language, { weekday: 'short' })
-    .format(date)
-    .toLowerCase();
+function dayName(date: DateTime): string {
+  return date.setLocale(settings.value.language).toLocaleString({ weekday: 'short' }).toLowerCase();
 }
 
 export function useTranslation() {

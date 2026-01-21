@@ -1,4 +1,5 @@
 import type { CalendarEvent } from '@/types/core';
+import { hydrateDates, dehydrateDates } from './mapper';
 
 const worker = new Worker(new URL('worker.ts', import.meta.url), { type: 'module' });
 
@@ -14,11 +15,14 @@ worker.onmessage = (e: MessageEvent) => {
   else handlers.resolve(result);
 };
 
-function call<T>(method: string, args: any[] = []): Promise<T> {
+async function call<T>(method: string, args: any[] = []): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const id = idCounter++;
-    pending.set(id, { resolve, reject });
-    worker.postMessage({ id, method, args });
+    pending.set(id, {
+      resolve: (data: any) => resolve(hydrateDates(data)),
+      reject,
+    });
+    worker.postMessage({ id, method, args: dehydrateDates(args) });
   });
 }
 

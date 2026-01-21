@@ -1,28 +1,39 @@
 import { useStorage } from '@vueuse/core';
 import { watch } from 'vue';
 import { languages } from '@/constants.ts';
+import type { HourNumbers, WeekdayNumbers } from 'luxon';
 
 export function useSettings() {
   return { settings };
 }
 
 type Theme = 'auto' | 'light' | 'dark';
+type CalendarView = '4days' | 'week' | 'month';
 type Lang = (typeof languages)[number]['code'];
 
 type UserSettings = {
   theme: Theme;
   language: Lang;
-  dayViewStartHour: number;
-  dayViewEndHour: number;
+  weekStart: WeekdayNumbers;
+  defaultView: CalendarView;
+  dayViewStartHour: HourNumbers;
+  dayViewEndHour: HourNumbers;
 };
 
 // default settings
-const settings = useStorage<UserSettings>('user-settings', {
-  theme: 'auto',
-  language: 'en',
-  dayViewStartHour: 6,
-  dayViewEndHour: 24,
-});
+const settings = useStorage<UserSettings>(
+  'user-settings',
+  {
+    theme: 'auto',
+    language: 'en',
+    weekStart: 1, // monday
+    defaultView: 'week',
+    dayViewStartHour: 6,
+    dayViewEndHour: 0,
+  },
+  localStorage,
+  { mergeDefaults: true },
+);
 
 // -------------------------- theme --------------------------
 function getSystemThemePreference() {
@@ -32,8 +43,7 @@ function getSystemThemePreference() {
 
 // auto html tag update
 function applyTheme(theme: Theme) {
-  if (theme === 'auto')
-    document.documentElement.setAttribute('data-theme', getSystemThemePreference());
+  if (theme === 'auto') document.documentElement.setAttribute('data-theme', getSystemThemePreference());
   else document.documentElement.setAttribute('data-theme', theme);
 }
 

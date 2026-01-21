@@ -2,19 +2,20 @@
 import { computed } from 'vue';
 import type { CalendarEvent } from '@/types/core.ts';
 import { useSettings } from '@/composables/useSettings';
+import type { DateTime } from 'luxon';
 
 const { settings } = useSettings();
 
 interface Props {
-  date: Date;
+  date: DateTime;
   numOfHours: number;
   events: CalendarEvent[];
 }
 const props = defineProps<Props>();
 
 function getEventPosition(event: CalendarEvent) {
-  const eventStartHours = event.from.getHours() + event.from.getMinutes() / 60;
-  const eventEndHours = event.to.getHours() + event.to.getMinutes() / 60;
+  const eventStartHours = event.from.hour + event.from.minute / 60;
+  const eventEndHours = event.to.hour + event.to.minute / 60;
   const viewStart = settings.value.dayViewStartHour;
 
   const start = Math.max(0, (eventStartHours - viewStart) / props.numOfHours);
@@ -46,7 +47,7 @@ const nonoverlappingGroups = computed(() => {
       const lastEventInLane = lane[lane.length - 1]!;
 
       // if the event starts after (or when) the last event in this lane ends
-      if (event.from.getTime() >= lastEventInLane.to.getTime()) {
+      if (event.from.toSeconds() >= lastEventInLane.to.toSeconds()) {
         lane.push(event);
         placed = true;
         break;

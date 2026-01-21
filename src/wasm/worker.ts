@@ -43,15 +43,8 @@ self.onmessage = async (e: MessageEvent) => {
     // call the Go WASM method
     let rawResult = await (self as any).CalendarCore[method](...jsonArgs);
 
-    let processedResult = rawResult;
-    if (typeof rawResult === 'string' && rawResult !== '') {
-      try {
-        processedResult = JSON.parse(rawResult);
-      } catch (e) {
-        // ff it's not valid JSON, keep it as a raw string (e.g., a simple status message)
-        processedResult = rawResult;
-      }
-    }
+    // unmarshall
+    let processedResult = typeof rawResult === 'string' && rawResult !== '' ? JSON.parse(rawResult) : rawResult;
 
     self.postMessage({ id, result: processedResult ?? null });
   } catch (err: any) {

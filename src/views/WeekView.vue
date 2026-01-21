@@ -73,8 +73,11 @@ const weekDates = computed(() => {
   });
 });
 
-const numOfHoursOnGrid = computed(() => {
-  return settings.value.dayViewEndHour - settings.value.dayViewStartHour;
+const hoursOnGrid = computed(() => {
+  const start = settings.value.dayViewStartHour;
+  const end = settings.value.dayViewEndHour;
+
+  return Array.from({ length: end - start }, (_, i) => `${String(start + i).padStart(2, '0')}:00`);
 });
 
 function getDateOnly(date: Date) {
@@ -104,21 +107,24 @@ onMounted(() => {
     <div id="top-bar">
       <span v-for="day in weekDates">{{ dayName(day) }}</span>
     </div>
+    <div id="left-time-bar">
+      <span v-for="h in hoursOnGrid">{{ h }}</span>
+    </div>
 
     <div id="content">
       <div class="hour-lines">
         <div
-          v-for="hour in numOfHoursOnGrid"
+          v-for="hour in hoursOnGrid.length"
           :key="hour"
           class="hour-line"
-          :style="{ top: (hour / numOfHoursOnGrid) * 100 + '%' }"
+          :style="{ top: (hour / hoursOnGrid.length) * 100 + '%' }"
         ></div>
       </div>
 
       <DayTimeline
         v-for="(d, i) in weekDates"
         :date="d"
-        :numOfHours="numOfHoursOnGrid"
+        :numOfHours="hoursOnGrid.length"
         :events="eventsByDay[i]!"
       />
     </div>
@@ -127,9 +133,14 @@ onMounted(() => {
 
 <style scoped>
 #week-view-container {
+  display: grid;
+  grid-template-columns: 3rem auto;
+  grid-template-rows: 2rem auto;
+  grid-template-areas:
+    '- topbar'
+    'timebar content';
+
   position: relative;
-  display: flex;
-  flex-direction: column;
   margin: 1rem;
 
   /*grid-template-rows: 100%;
@@ -146,10 +157,27 @@ onMounted(() => {
 #content {
   position: relative;
   border-right: var(--grid-border); /* add the missing border for the grid */
+  grid-area: content;
 }
 
 #top-bar {
   border-bottom: var(--grid-border);
+  grid-area: topbar;
+}
+
+#left-time-bar {
+  grid-area: timebar;
+  display: grid;
+
+  span {
+    border-top: 1px solid transparent;
+    font-size: 0.8rem;
+    text-align: right;
+    padding-right: 0.6rem;
+
+    position: relative;
+    top: -0.5rem;
+  }
 }
 
 .hour-lines {

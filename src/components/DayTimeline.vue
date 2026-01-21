@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { CalendarEvent } from '@/types/core.ts';
+import { useSettings } from '@/composables/useSettings';
+
+const { settings } = useSettings();
 
 interface Props {
   date: Date;
@@ -9,16 +12,13 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-// Convert a Date to a fraction of the timeline (0..1)
 function getEventPosition(event: CalendarEvent) {
-  const dayStart = new Date(props.date);
-  dayStart.setHours(0, 0, 0, 0);
-
   const eventStartHours = event.from.getHours() + event.from.getMinutes() / 60;
   const eventEndHours = event.to.getHours() + event.to.getMinutes() / 60;
+  const viewStart = settings.value.dayViewStartHour;
 
-  const start = Math.max(0, eventStartHours / props.numOfHours);
-  const end = Math.min(1, eventEndHours / props.numOfHours);
+  const start = Math.max(0, (eventStartHours - viewStart) / props.numOfHours);
+  const end = Math.min(1, (eventEndHours - viewStart) / props.numOfHours);
 
   return { start, end };
 }

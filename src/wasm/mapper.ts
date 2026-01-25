@@ -1,17 +1,29 @@
 import { DateTime } from 'luxon';
 
-// In your hydrate function (updated version)
+const dateTimeFieldNames: string[] = ['from', 'to'];
+
+// This shit does transform the JSON date values (ISO format) to a luxon DateTime object, but only internally,
+// meaning I don't know how validation in TS/JS works with the lack of reflection (more like doesnt),
+// so it only makes sure that the date fields in JSON get parsed, but it still saves them as any, which seems strange to me
+//
+// If you do:
+//  const inputJSON = { /* stuff */ };
+//  const event: CalendarEvent = inputJSON;
+// it works haha, but event.from.day crashes, because the from is still a fakin string or js standard Date.
+//
+// So this hydrateDates tries to parse it beforehand.
 export function hydrateDates<T>(data: unknown): T {
-  if (!data || typeof data !== 'object') return data as T;
+  // non-object, primitive, null
+  if (data === null || typeof data !== 'object') return data as T;
 
   if (Array.isArray(data)) {
-    return data.map(hydrateDates) as any;
+    return data.map(hydrateDates) as any; // recursively for arrays
   }
 
   const result: Record<string, any> = {};
 
   for (const [key, value] of Object.entries(data)) {
-    if ((key === 'from' || key === 'to') && typeof value === 'string') {
+    if (dateTimeFieldNames.includes(key) && typeof value === 'string') {
       const dt = DateTime.fromISO(value, {
         setZone: true, // respect & keep the timezone offset from the string
       });
@@ -23,7 +35,7 @@ export function hydrateDates<T>(data: unknown): T {
         result[key] = dt;
       }
     } else if (value && typeof value === 'object' && !Array.isArray(value)) {
-      result[key] = hydrateDates(value);
+      result[key] = hydrateDates(value); // recursively for objects
     } else {
       result[key] = value;
     }
@@ -32,25 +44,31 @@ export function hydrateDates<T>(data: unknown): T {
   return result as T;
 }
 
+// The other way around, meaning it goes from DateTime to string (only underlining, it still is undefined lol).
 export function dehydrateDates(data: unknown): unknown {
-  if (!data || typeof data !== 'object') {
-    return data;
+  // top-level DateTime
+  if (data instanceof DateTime) {
+    return data.toISO();
   }
 
+  // non-object, primitive, null
+  if (!data || typeof data !== 'object') return data;
+
   if (Array.isArray(data)) {
-    return data.map(dehydrateDates);
+    return data.map(dehydrateDates); // recursively for arrays
   }
 
   const result: Record<string, any> = {};
 
   for (const [key, value] of Object.entries(data)) {
     if (value instanceof DateTime) {
-      result[key] = value.toISO(); // → "2026-01-21T10:00:00.000+01:00"
-      // or value.toUTC().toISO()         // if you want always UTC
-      // or value.toFormat("yyyy-MM-dd'T'HH:mm:ss")  // no zone/offset
+      // date
+      result[key] = value.toISO();
     } else if (value && typeof value === 'object') {
+      // recursive for objects
       result[key] = dehydrateDates(value);
     } else {
+      // we dont know, we dont care
       result[key] = value;
     }
   }

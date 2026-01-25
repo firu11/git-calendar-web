@@ -1,31 +1,46 @@
 <script setup lang="ts">
 import { CalendarCore } from '@/wasm/core-wrapper';
 import { onMounted } from 'vue';
-import { v4 as uuidv4 } from 'uuid';
 import { DateTime } from 'luxon';
 
 onMounted(async () => {
-  // let e: CalendarEvent = await CalendarCore.getEvent(1);
+  // const uid = uuidv4();
+  // // await CalendarCore.createEvent({
+  // //   id: uid,
+  // //   from: DateTime.now(),
+  // //   to: DateTime.now().plus({ hour: 2 }),
+  // //   title: 'Meeting',
+  // //   location: '',
+  // // });
+  // let e: CalendarEvent = await CalendarCore.getEvent(uid);
+  // console.log(e.from.hour);
 });
+
+async function createEventAndLogIt() {
+  const newEvent = await CalendarCore.createEvent({
+    from: DateTime.now(),
+    to: DateTime.now().plus({ hour: 2 }),
+    title: 'Meeting',
+  });
+
+  console.log('created an event:', newEvent);
+}
 </script>
 
 <template>
-  <button @click="CalendarCore.initialize()">Init</button>
-  <button @click="CalendarCore.delete()">Delete</button>
-  <button @click="CalendarCore.clone('https://github.com/firu11/personal-web')">Clone</button>
-  <button
-    @click="
-      CalendarCore.addEvent({
-        id: uuidv4(),
-        from: DateTime.now(),
-        to: DateTime.now().plus({ hour: 2 }),
-        title: 'Meeting',
-        location: '',
-      })
-    "
-  >
-    Add Event
-  </button>
+  <div>
+    <button @click="CalendarCore.initialize()">Init</button>
+    <button @click="CalendarCore.delete()">Delete</button>
+    <button @click="CalendarCore.clone('https://github.com/firu11/personal-web')">Clone</button>
+    <br />
+    <button @click="createEventAndLogIt()">Create Event</button>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+</style>

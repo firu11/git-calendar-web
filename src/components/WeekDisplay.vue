@@ -45,7 +45,7 @@ const hoursOnGrid = computed(() => {
 const eventsByDay = ref<CalendarEvent[][]>(Array.from({ length: 7 }, () => []));
 
 onMounted(async () => {
-  const events = await CalendarCore.getEvents(1, 1);
+  const events = await CalendarCore.getEvents(DateTime.now(), DateTime.now());
 
   for (const event of events) {
     // normalize to start of day

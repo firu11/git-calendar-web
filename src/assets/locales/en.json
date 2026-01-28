@@ -1,3 +1,10 @@
 {
-  "test": "Hello"
+  "test": "Hello",
+  "settings": {
+    "language": "Language",
+    "timeFormat": "Time Format",
+    "12hourFormat": "12-hour time",
+    "24hourFormat": "24-hour time",
+    "weekStart": "Week start"
+  }
 }

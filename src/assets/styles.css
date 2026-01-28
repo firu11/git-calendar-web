@@ -24,11 +24,7 @@ body {
   height: 100dvh;
 
   display: grid;
-  grid-template-columns: var(--sidebar-width) auto;
   grid-template-rows: var(--navbar-height) auto;
-  grid-template-areas:
-    'navbar navbar'
-    'sidebar main';
 }
 
 a {

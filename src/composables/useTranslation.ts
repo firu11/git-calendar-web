@@ -29,14 +29,22 @@ const i18n = createI18n<[MessageSchema], LocaleCode>({
 watch(
   () => settings.value.language,
   (newLang) => {
-    i18n.global.locale = newLang;
+    (i18n.global.locale as any).value = newLang; // WHY TYPESCRIPT WHY
   },
 );
 
 function dayName(date: DateTime): string {
-  return date.setLocale(settings.value.language).toLocaleString({ weekday: 'short' }).toLowerCase();
+  let str = date.setLocale(settings.value.language).toLocaleString({ weekday: 'short' });
+  str = str.charAt(0).toUpperCase() + str.slice(1); // make it uppercase every time
+  return str;
+}
+
+function dayNameLong(date: DateTime): string {
+  let str = date.setLocale(settings.value.language).toLocaleString({ weekday: 'long' });
+  str = str.charAt(0).toUpperCase() + str.slice(1); // make it uppercase every time
+  return str;
 }
 
 export function useTranslation() {
-  return { i18n, dayName };
+  return { i18n, dayName, dayNameLong };
 }

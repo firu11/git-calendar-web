@@ -1,3 +1,10 @@
 {
-  "test": "Ahoj"
+  "test": "Ahoj",
+  "settings": {
+    "language": "Jazyk",
+    "timeFormat": "Formát času",
+    "12hourFormat": "12ti hodinový čas",
+    "24hourFormat": "24ti hodinový čas",
+    "weekStart": "Začátek týdne"
+  }
 }

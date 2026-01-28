@@ -73,7 +73,7 @@ onMounted(async () => {
 <template>
   <div id="week-view-container">
     <div id="top-bar">
-      <span v-for="day in weekDates">{{ dayName(day) }}</span>
+      <span v-for="day in weekDates">{{ `${dayName(day)} ${day.day}` }}</span>
     </div>
     <div id="left-time-bar">
       <span v-for="h in hoursOnGrid">{{ h }}</span>
@@ -107,9 +107,6 @@ onMounted(async () => {
 
   position: relative;
   margin: 1rem;
-
-  /*grid-template-rows: 100%;
-  grid-template-columns: 1fr;*/
 }
 
 #top-bar,

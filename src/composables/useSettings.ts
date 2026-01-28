@@ -9,7 +9,7 @@ export function useSettings() {
 
 type Theme = 'auto' | 'light' | 'dark';
 type CalendarView = '4days' | 'week' | 'month';
-type HourCycle = 'h11' | 'h23';
+type HourCycle = 'h12' | 'h24';
 type Lang = (typeof languages)[number]['code'];
 
 type UserSettings = {
@@ -28,7 +28,7 @@ const settings = useStorage<UserSettings>(
   {
     theme: 'auto',
     language: 'en',
-    timeFormat: 'h23',
+    timeFormat: 'h24',
     weekStart: 1, // monday
     defaultView: 'week',
     dayViewStartHour: 6,

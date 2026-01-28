@@ -34,7 +34,6 @@ function getEventStylePos(e: CalendarEvent) {
 
 // Formats times based on timeFormat (17/5 pm) and puts it together like: '10:00 - 11:30'.
 function timeRangeFormat(from: DateTime, to: DateTime): string {
-  console.log(settings.value.timeFormat);
   const fromTime = from.toLocaleString({ hour: '2-digit', minute: '2-digit', hourCycle: settings.value.timeFormat });
   const toTime = to.toLocaleString({ hour: '2-digit', minute: '2-digit', hourCycle: settings.value.timeFormat });
   return `${fromTime} - ${toTime}`;

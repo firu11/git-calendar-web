@@ -96,6 +96,8 @@ onMounted(async () => {
 
 <style scoped>
 #week-view-container {
+  height: calc(100% - 2rem);
+
   display: grid;
   grid-template-columns: 3rem auto;
   grid-template-rows: 2rem auto;

@@ -48,4 +48,18 @@ function timeRangeFormat(from: DateTime, to: DateTime): string {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.timeline-event {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background-color: rgba(100, 149, 237, 0.5);
+  border-left: 3px solid #6495ed;
+  padding: 0.2rem;
+  font-size: 0.75rem;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+</style>

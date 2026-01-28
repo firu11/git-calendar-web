@@ -24,8 +24,8 @@ body {
   height: 100dvh;
 
   display: grid;
-  grid-template-columns: var(--sidebar-width) 1fr;
-  grid-template-rows: var(--navbar-height) 1fr;
+  grid-template-columns: var(--sidebar-width) auto;
+  grid-template-rows: var(--navbar-height) auto;
   grid-template-areas:
     'navbar navbar'
     'sidebar main';

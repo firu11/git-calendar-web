@@ -13,7 +13,6 @@ import SideBar from './components/SideBar.vue';
 
 <style scoped>
 main {
-  height: 50%;
   grid-area: main;
 }
 </style>

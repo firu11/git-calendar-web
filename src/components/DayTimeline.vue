@@ -64,24 +64,10 @@ const nonoverlappingGroups = computed(() => {
   display: grid;
   grid-auto-flow: column;
   gap: 0.5rem;
-  height: 30rem;
+  height: 100%;
 }
 
 .timeline-group {
   position: relative;
-}
-
-.timeline-event {
-  position: absolute;
-  left: 0;
-  right: 0;
-  background-color: rgba(100, 149, 237, 0.5);
-  border-left: 3px solid #6495ed;
-  padding: 0.2rem;
-  font-size: 0.75rem;
-
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 </style>

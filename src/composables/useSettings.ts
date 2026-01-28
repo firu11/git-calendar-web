@@ -9,11 +9,13 @@ export function useSettings() {
 
 type Theme = 'auto' | 'light' | 'dark';
 type CalendarView = '4days' | 'week' | 'month';
+type HourCycle = 'h11' | 'h23';
 type Lang = (typeof languages)[number]['code'];
 
 type UserSettings = {
   theme: Theme;
   language: Lang;
+  timeFormat: HourCycle; // maybe use Intl.LocaleHourCycleKey as type
   weekStart: WeekdayNumbers;
   defaultView: CalendarView;
   dayViewStartHour: HourNumbers;
@@ -26,6 +28,7 @@ const settings = useStorage<UserSettings>(
   {
     theme: 'auto',
     language: 'en',
+    timeFormat: 'h23',
     weekStart: 1, // monday
     defaultView: 'week',
     dayViewStartHour: 6,

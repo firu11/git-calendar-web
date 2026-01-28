@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { CalendarEvent } from '@/types/core.ts';
-import { useSettings } from '@/composables/useSettings';
 import type { DateTime } from 'luxon';
-
-const { settings } = useSettings();
+import TimelineEvent from './TimelineEvent.vue';
 
 interface Props {
   date: DateTime;
@@ -12,25 +10,6 @@ interface Props {
   events: CalendarEvent[];
 }
 const props = defineProps<Props>();
-
-function getEventPosition(event: CalendarEvent) {
-  const eventStartHours = event.from.hour + event.from.minute / 60;
-  const eventEndHours = event.to.hour + event.to.minute / 60;
-  const viewStart = settings.value.dayViewStartHour;
-
-  const start = Math.max(0, (eventStartHours - viewStart) / props.numOfHours);
-  const end = Math.min(1, (eventEndHours - viewStart) / props.numOfHours);
-
-  return { start, end };
-}
-
-function getEventStylePos(e: CalendarEvent) {
-  const pos = getEventPosition(e);
-  return {
-    top: `${pos.start * 100}%`,
-    height: `${(pos.end - pos.start) * 100}%`,
-  };
-}
 
 // expects events to be sorted by "from" beforehand in Wasm
 const nonoverlappingGroups = computed(() => {
@@ -68,9 +47,7 @@ const nonoverlappingGroups = computed(() => {
   <div class="day-timeline">
     <div class="timeline-grid">
       <div class="timeline-group" v-for="g in nonoverlappingGroups">
-        <div v-for="e in g" :key="e.id" class="timeline-event" :style="getEventStylePos(e)">
-          {{ e.title }}
-        </div>
+        <TimelineEvent v-for="e in g" :key="e.id" :event="e" :numOfHours="props.numOfHours" />
       </div>
     </div>
   </div>

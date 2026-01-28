@@ -7,6 +7,7 @@ import { useSettings } from '@/composables/useSettings.ts';
 const { locale } = useI18n();
 const { settings } = useSettings();
 
+// watch the select and set the locale from I18n accordingly
 watch(
   () => settings.value.language,
   (newLang: string) => {

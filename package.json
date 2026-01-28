@@ -12,7 +12,9 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "format": "prettier --write --experimental-cli src/"
+    "format": "prettier --write --experimental-cli src/",
+    "update-wasm": "curl -L -o src/wasm/core.wasm https://github.com/firu11/git-calendar-core/releases/latest/download/core.wasm",
+    "wip-prebuild": "npm run update-wasm"
   },
   "dependencies": {
     "@vueuse/core": "^14.1.0",

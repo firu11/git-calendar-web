@@ -1,3 +1,1 @@
 src/wasm/wasm_exec.js linguist-generated
-src/wasm/core.wasm linguist-generated
-src/wasm/core.wasm filter=lfs diff=lfs merge=lfs -text

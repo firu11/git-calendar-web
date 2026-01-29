@@ -1,13 +1,19 @@
 <script setup lang="ts">
 import WeekDisplay from '@/components/WeekDisplay.vue';
 import SideBar from '@/components/SideBar.vue';
+import MonthSideMap from '@/components/MonthSideMap.vue';
 import { useSettings } from '@/composables/useSettings';
 import { computed, ref } from 'vue';
 import { DateTime, Duration } from 'luxon';
 
 const { settings } = useSettings();
 
-const viewName = ref(settings.value.defaultView);
+const activeView = ref(settings.value.defaultView);
+const views = {
+  week: WeekDisplay,
+  '4days': null,
+  month: null,
+};
 
 const today = DateTime.now();
 
@@ -22,8 +28,10 @@ const startOfTheWeek = computed(() => {
 
 <template>
   <div id="calendar-view">
-    <SideBar />
-    <WeekDisplay v-if="viewName === 'week'" :startDate="startOfTheWeek" />
+    <SideBar>
+      <MonthSideMap :monthNumber="startOfTheWeek.month" :highlightedWeekNumber="startOfTheWeek.weekNumber" />
+    </SideBar>
+    <component :is="views[activeView]" :startDate="startOfTheWeek"></component>
   </div>
 </template>
 

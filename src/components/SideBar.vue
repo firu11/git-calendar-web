@@ -1,13 +1,16 @@
 <script setup lang="ts"></script>
 
 <template>
-  <aside>Sidebar</aside>
+  <aside>
+    <slot />
+  </aside>
 </template>
 
 <style scoped>
 aside {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 
   padding: 1rem;
 

@@ -26,6 +26,10 @@ async function initWasm() {
 }
 
 async function initOPFS() {
+  if (!navigator.storage || typeof navigator.storage.getDirectory !== 'function') {
+    throw new Error('OPFS not available. navigator.storage: ' + navigator.storage);
+  }
+
   opfsRootHandle = await navigator.storage.getDirectory();
   // expose for Go
   (self as any).opfsRootHandle = opfsRootHandle;

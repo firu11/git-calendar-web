@@ -47,6 +47,8 @@ worker.onmessage = (e: MessageEvent) => {
   const handlers = pending.get(id);
   if (!handlers) return;
   pending.delete(id);
-  if (error) handlers.reject(new Error(`CalendarCore failed: ${error}`));
-  else handlers.resolve(result);
+  if (error) {
+    handlers.reject(new Error(`CalendarCore call failed: ${error}`));
+    if (error.startsWith('OPFS')) alert('OPFS is not available. Are you on a secure connection (HTTPS)?');
+  } else handlers.resolve(result);
 };

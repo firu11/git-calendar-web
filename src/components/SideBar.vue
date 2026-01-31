@@ -12,7 +12,7 @@ aside {
   flex-direction: column;
   align-items: center;
 
-  padding: 1rem;
+  padding: 0.5rem;
 
   background-color: var(--sidebar-color);
 }

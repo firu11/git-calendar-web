@@ -34,17 +34,29 @@ watch(
 );
 
 function dayName(date: DateTime): string {
-  let str = date.setLocale(settings.value.language).toLocaleString({ weekday: 'short' });
+  let str = date.toLocaleString({ weekday: 'short' });
   str = str.charAt(0).toUpperCase() + str.slice(1); // make it uppercase every time
   return str;
 }
 
 function dayNameLong(date: DateTime): string {
-  let str = date.setLocale(settings.value.language).toLocaleString({ weekday: 'long' });
+  let str = date.toLocaleString({ weekday: 'long' });
+  str = str.charAt(0).toUpperCase() + str.slice(1); // make it uppercase every time
+  return str;
+}
+
+function monthName(date: DateTime): string {
+  let str = date.toLocaleString({ month: 'short' });
+  str = str.charAt(0).toUpperCase() + str.slice(1); // make it uppercase every time
+  return str;
+}
+
+function monthNameLong(date: DateTime): string {
+  let str = date.toLocaleString({ month: 'long' });
   str = str.charAt(0).toUpperCase() + str.slice(1); // make it uppercase every time
   return str;
 }
 
 export function useTranslation() {
-  return { i18n, dayName, dayNameLong };
+  return { i18n, dayName, dayNameLong, monthName, monthNameLong };
 }

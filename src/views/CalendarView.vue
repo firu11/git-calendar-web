@@ -29,7 +29,11 @@ const startOfTheWeek = computed(() => {
 <template>
   <div id="calendar-view">
     <SideBar>
-      <MonthSideMap :monthNumber="startOfTheWeek.month" :highlightedWeekNumber="startOfTheWeek.weekNumber" />
+      <MonthSideMap
+        :year="startOfTheWeek.year"
+        :monthNumber="startOfTheWeek.month"
+        :highlightedWeekNumber="startOfTheWeek.weekNumber"
+      />
     </SideBar>
     <component :is="views[activeView]" :startDate="startOfTheWeek"></component>
   </div>

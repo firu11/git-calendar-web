@@ -1,7 +1,7 @@
 import { useStorage } from '@vueuse/core';
 import { watch } from 'vue';
 import { languages } from '@/constants.ts';
-import type { HourNumbers, WeekdayNumbers } from 'luxon';
+import { type HourNumbers, type WeekdayNumbers, Settings as LuxonSettings } from 'luxon';
 
 export function useSettings() {
   return { settings };
@@ -37,6 +37,14 @@ const settings = useStorage<UserSettings>(
   localStorage,
   { mergeDefaults: true },
 );
+
+watch(
+  () => settings.value.language,
+  (newLang) => {
+    LuxonSettings.defaultLocale = newLang;
+  },
+);
+LuxonSettings.defaultLocale = settings.value.language;
 
 // -------------------------- theme --------------------------
 function getSystemThemePreference() {

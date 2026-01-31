@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useTranslation } from '@/composables/useTranslation';
-import { DateTime, Duration } from 'luxon';
-import { computed, ref } from 'vue';
+import { DateTime } from 'luxon';
+import { computed, ref, watch } from 'vue';
 
 const { monthNameLong } = useTranslation();
 
@@ -11,6 +11,14 @@ interface Props {
   highlightedWeekNumber: number;
 }
 const props = defineProps<Props>();
+
+watch(
+  () => props.monthNumber,
+  () => {
+    monthNumberTracker.value = props.monthNumber;
+    yearTracker.value = props.year;
+  },
+);
 
 const monthNumberTracker = ref(props.monthNumber);
 const yearTracker = ref(props.year);
@@ -34,17 +42,27 @@ const days = computed(() => {
 
   const result: DateTime[] = [];
 
+  // trailing days from previous month
   const numOfDaysFromLastMonth = firstOfTheMonth.weekday - 1;
   for (let i = numOfDaysFromLastMonth; i > 0; i--) {
-    result.push(firstOfTheMonth.minus(Duration.fromObject({ days: i })));
+    result.push(firstOfTheMonth.minus({ days: i }));
   }
 
+  // add more days until we fill at least 42 cells (6×7)
   const moreDaysNeeded = 6 * 7 - result.length;
   for (let i = 0; i < moreDaysNeeded; i++) {
-    result.push(firstOfTheMonth.plus(Duration.fromObject({ days: i })));
+    result.push(firstOfTheMonth.plus({ days: i }));
   }
 
   return result;
+});
+
+const weeks = computed(() => {
+  const chunks = [];
+  for (let i = 0; i < days.value.length; i += 7) {
+    chunks.push(days.value.slice(i, i + 7));
+  }
+  return chunks;
 });
 </script>
 
@@ -59,17 +77,29 @@ const days = computed(() => {
         <button @click="changeMonthNum(true)">&gt;</button>
       </span>
     </div>
+
     <div id="day-grid">
-      <div v-for="i in 7" class="day-name">{{ days[i - 1]?.weekdayShort?.charAt(0).toLocaleLowerCase() }}</div>
+      <div v-for="i in 7" class="day-name">
+        {{ days[i - 1]?.weekdayShort?.slice(0, 2) }}
+      </div>
+
       <div
-        v-for="d in days"
-        class="day"
-        :class="{
-          notThisMonth: d.month !== monthNumberTracker,
-          today: d.hasSame(DateTime.now(), 'day'),
-        }"
+        v-for="(week, wIndex) in weeks"
+        :key="wIndex"
+        class="week-row"
+        :class="{ 'highlighted-week': week.some((d) => d.weekNumber === props.highlightedWeekNumber) }"
       >
-        {{ d.day }}
+        <div
+          v-for="d in week"
+          :key="d.toString()"
+          class="day"
+          :class="{
+            today: d.hasSame(DateTime.now(), 'day'),
+            'not-this-month': d.month !== monthNumberTracker,
+          }"
+        >
+          {{ d.day }}
+        </div>
       </div>
     </div>
   </div>
@@ -78,30 +108,32 @@ const days = computed(() => {
 <style scoped>
 #month-side-map {
   width: 100%;
-
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 
   .container {
-    padding-left: 0.5rem;
+    padding-left: 0.4rem;
     display: flex;
+    align-items: center;
     justify-content: space-between;
+    font-weight: bold;
   }
 }
 
 #month-nav {
   display: flex;
+  gap: 0.2rem;
 
   button {
     width: 1.8rem;
-    border: none;
-    background-color: transparent;
-    color: var(--text-color);
+    height: 1.8rem;
+    font-weight: 900;
+    border-radius: var(--small-border-radius);
 
-    background-color: transparent;
-    cursor: pointer;
-    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &:hover {
       background-color: var(--sidebar-hover-color);
@@ -111,48 +143,64 @@ const days = computed(() => {
 
 #day-grid {
   display: grid;
-  gap: 0.2rem;
-  grid-template-rows: repeat(6, auto); /* 6 weeks */
-  grid-template-columns: repeat(7, 1fr); /* 7 days */
-
-  overflow: hidden; /* cut off the line */
+  grid-template-columns: repeat(7, 1fr);
 
   .day-name {
     text-align: center;
-    position: relative;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    opacity: 0.5;
     padding-bottom: 0.5rem;
-
-    /* add underline */
-    &::after {
-      content: '';
-      position: absolute;
-      left: -0.1rem;
-      right: -0.1rem;
-      bottom: 0.3rem;
-      height: 1px;
-      background: var(--text-color);
-      pointer-events: none;
-    }
   }
 
-  .day {
-    text-align: center;
-    cursor: pointer;
-    border-radius: 3px;
-    height: 1.5rem;
-    line-height: 1.5rem;
+  .week-row {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    border: 1px transparent solid;
+    border-radius: var(--small-border-radius);
+
+    &.highlighted-week {
+      background-color: var(--git-color) !important;
+      color: var(--text-color-hard);
+
+      .day.not-this-month {
+        opacity: 0.7;
+      }
+    }
 
     &:hover {
       background-color: var(--sidebar-hover-color);
     }
   }
 
-  .notThisMonth {
-    opacity: 0.5;
-  }
+  .day {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    border-radius: var(--small-border-radius);
+    cursor: pointer;
 
-  .today {
-    border: 1px solid var(--text-color);
+    &.today {
+      font-weight: 900;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 3px;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: currentColor;
+      }
+    }
+
+    &.not-this-month {
+      opacity: 0.3;
+    }
   }
 }
 </style>

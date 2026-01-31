@@ -2,7 +2,7 @@
 import { useSettings } from '@/composables/useSettings';
 import { useTranslation } from '@/composables/useTranslation';
 import { DateTime, type WeekdayNumbers } from 'luxon';
-import { languages } from '@/constants.ts';
+import { LANGUAGES } from '@/constants.ts';
 
 const { settings } = useSettings();
 const { dayNameLong } = useTranslation();
@@ -10,10 +10,11 @@ const { dayNameLong } = useTranslation();
 
 <template>
   <form>
+    <RouterLink to="/">&lt; Back to calendar</RouterLink>
     <label
       >{{ $t('settings.language') }}:
       <select v-model="settings.language">
-        <option v-for="lang in languages" :key="lang.code" :value="lang.code">
+        <option v-for="lang in LANGUAGES" :key="lang.code" :value="lang.code">
           {{ lang.label }}
         </option>
       </select>

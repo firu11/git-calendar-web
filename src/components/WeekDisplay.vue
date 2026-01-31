@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import DayTimeline from '@/components/DayTimeline.vue';
 import type { CalendarEvent } from '@/types/core.ts';
 import { useSettings } from '@/composables/useSettings';
@@ -14,6 +14,13 @@ interface Props {
   startDate: DateTime;
 }
 const props = defineProps<Props>();
+
+watch(
+  () => props.startDate,
+  async () => {
+    eventsByDay.value = await getEventsForWeek();
+  },
+);
 
 const weekDates = computed(() => {
   return Array.from({ length: 7 }, (_, i) => {
@@ -51,7 +58,8 @@ const hoursOnGrid = computed(() => {
 
 const eventsByDay = ref<CalendarEvent[][]>(Array.from({ length: 7 }, () => []));
 
-onMounted(async () => {
+async function getEventsForWeek(): Promise<CalendarEvent[][]> {
+  const result: CalendarEvent[][] = Array.from({ length: 7 }, () => []);
   const events = await CalendarCore.getEvents(DateTime.now(), DateTime.now());
 
   for (const event of events) {
@@ -64,16 +72,24 @@ onMounted(async () => {
 
     // add it to appropriate day
     if (dayIndex >= 0 && dayIndex < 7) {
-      eventsByDay.value[dayIndex]?.push(event);
+      result[dayIndex]?.push(event);
     }
   }
+
+  return result;
+}
+
+onMounted(async () => {
+  eventsByDay.value = await getEventsForWeek();
 });
 </script>
 
 <template>
   <div id="week-view-container">
     <div id="top-bar">
-      <span v-for="day in weekDates">{{ `${dayName(day)} ${day.day}` }}</span>
+      <span v-for="day in weekDates" :class="{ today: day.hasSame(DateTime.now(), 'day') }">{{
+        `${day.day}. ${dayName(day)}`
+      }}</span>
     </div>
     <div id="left-time-bar">
       <span v-for="h in hoursOnGrid">{{ h }}</span>

@@ -2,7 +2,6 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap'); /* TODO */
 
 :root {
-  --navbar-height: 3rem;
   --sidebar-width: 15rem;
 }
 
@@ -10,6 +9,14 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* default btn is horrible */
+button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-color);
 }
 
 body {
@@ -22,9 +29,6 @@ body {
 
 #app {
   height: 100dvh;
-
-  display: grid;
-  grid-template-rows: var(--navbar-height) auto;
 }
 
 a {

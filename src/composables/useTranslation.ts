@@ -2,12 +2,12 @@
 
 import { watch } from 'vue';
 import { createI18n } from 'vue-i18n';
-import type { languages } from '@/constants.ts';
+import type { LANGUAGES } from '@/constants.ts';
 import { useSettings } from '@/composables/useSettings.ts'; // init settings
 import { DateTime } from 'luxon';
 
 const { settings } = useSettings();
-type LocaleCode = (typeof languages)[number]['code'];
+type LocaleCode = (typeof LANGUAGES)[number]['code'];
 type MessageSchema = typeof import('@/assets/locales/en.json'); // type-define 'en' as the master schema for the resource
 
 const localeModules = import.meta.glob('@/assets/locales/*.json', { eager: true });

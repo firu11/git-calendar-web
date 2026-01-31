@@ -4,7 +4,7 @@ import SideBar from '@/components/SideBar.vue';
 import MonthSideMap from '@/components/MonthSideMap.vue';
 import { useSettings } from '@/composables/useSettings';
 import { computed, ref } from 'vue';
-import { DateTime, Duration } from 'luxon';
+import { DateTime } from 'luxon';
 
 const { settings } = useSettings();
 
@@ -16,10 +16,11 @@ const views = {
 };
 
 const today = DateTime.now();
+const offset = ref(0);
 
 const startOfTheWeek = computed(() => {
   const diff = (today.weekday - settings.value.weekStart + 7) % 7;
-  const startDate = today.minus(Duration.fromObject({ days: diff }));
+  const startDate = today.minus({ days: diff, weeks: offset.value });
 
   startDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 }); // maybe not needed
   return startDate;
@@ -43,6 +44,7 @@ const startOfTheWeek = computed(() => {
 #calendar-view {
   display: grid;
   grid-template-columns: var(--sidebar-width) auto;
+  grid-template-rows: var(--);
   grid-auto-flow: row;
 
   height: 100%;

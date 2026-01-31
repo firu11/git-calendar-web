@@ -1,12 +1,13 @@
-<script setup lang="ts">
-import NavBar from '@/components/NavBar.vue';
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <NavBar />
   <main>
     <RouterView />
   </main>
 </template>
 
-<style scoped></style>
+<style scoped>
+main {
+  height: 100%;
+}
+</style>

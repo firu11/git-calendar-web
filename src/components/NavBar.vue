@@ -2,7 +2,7 @@
 
 <template>
   <header>
-    <span>Git Calendar Web - {{ $t('test') }}</span>
+    <span>Git Calendar Web</span>
     <span style="display: flex; gap: 0.5em">
       <RouterLink to="/">calendar</RouterLink>
       <RouterLink to="/settings">settings</RouterLink>

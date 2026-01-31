@@ -2,6 +2,12 @@
   "test": "Ahoj",
   "settings": {
     "language": "Jazyk",
+    "themes": {
+      "theme": "Téma",
+      "auto": "Automatické",
+      "light": "Světlé",
+      "dark": "Tmavé"
+    },
     "timeFormat": "Formát času",
     "12hourFormat": "12ti hodinový čas",
     "24hourFormat": "24ti hodinový čas",

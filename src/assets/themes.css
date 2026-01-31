@@ -5,6 +5,7 @@
 
   --navbar-color: #3d3d3d;
   --sidebar-color: #363636;
+  --sidebar-hover-color: #464646;
 
   --grid-color: #363636;
   --grid-thickness: 1px;
@@ -15,6 +16,11 @@
   --bg-color: #f2f2f2;
   --text-color: #101010;
 
-  --navbar-color: #d4d4d4;
+  --navbar-color: #c4c4c4;
   --sidebar-color: #d4d4d4;
+  --sidebar-hover-color: #c4c4c4;
+
+  --grid-color: #d1d1d1;
+  --grid-thickness: 1px;
+  --grid-border: var(--grid-thickness) solid var(--grid-color);
 }

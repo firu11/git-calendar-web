@@ -33,6 +33,14 @@ const { dayNameLong } = useTranslation();
         </option>
       </select>
     </label>
+    <label>
+      {{ $t('settings.themes.theme') }}:
+      <select name="theme" v-model="settings.theme">
+        <option value="auto">{{ $t('settings.themes.auto') }}</option>
+        <option value="light">{{ $t('settings.themes.light') }}</option>
+        <option value="dark">{{ $t('settings.themes.dark') }}</option>
+      </select>
+    </label>
   </form>
 </template>
 

@@ -29,5 +29,5 @@ body {
 
 a {
   /* temporary TODO */
-  color: skyblue;
+  color: var(--text-color);
 }

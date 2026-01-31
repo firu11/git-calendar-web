@@ -2,6 +2,12 @@
   "test": "Hello",
   "settings": {
     "language": "Language",
+    "themes": {
+      "theme": "Theme",
+      "auto": "Automatic",
+      "light": "Light",
+      "dark": "Dark"
+    },
     "timeFormat": "Time Format",
     "12hourFormat": "12-hour time",
     "24hourFormat": "24-hour time",

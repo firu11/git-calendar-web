@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import type { CalendarEvent } from '@/types/core.ts';
 import type { DateTime } from 'luxon';
-import TimelineEvent from './TimelineEvent.vue';
+import TimelineEvent from '@/components/TimelineEvent.vue';
 
 interface Props {
   date: DateTime;

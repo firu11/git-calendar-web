@@ -22,6 +22,7 @@
     "uuid": "^13.0.0",
     "vue": "^3.5.26",
     "vue-i18n": "^11.2.8",
+    "vue-icons-plus": "^0.1.9",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {

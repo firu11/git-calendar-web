@@ -4,14 +4,15 @@
   <aside>
     <slot />
     <div id="links">
-      <RouterLink to="/settings">settings</RouterLink>
-      <RouterLink to="/test">git testing</RouterLink>
+      <router-link to="/settings">settings</router-link>
+      <router-link to="/test">git testing</router-link>
     </div>
   </aside>
 </template>
 
 <style scoped>
 aside {
+  grid-area: sidebar;
   display: flex;
   flex-direction: column;
   align-items: center;

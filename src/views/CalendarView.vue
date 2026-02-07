@@ -2,48 +2,42 @@
 import WeekDisplay from '@/components/WeekDisplay.vue';
 import SideBar from '@/components/SideBar.vue';
 import MonthSideMap from '@/components/MonthSideMap.vue';
-import { useSettings } from '@/composables/useSettings';
-import { computed, ref } from 'vue';
-import { DateTime } from 'luxon';
+import TopBar from '@/components/TopBar.vue';
+
+import { calendarViewValues, useSettings, type CalendarView } from '@/composables/useSettings';
+import { computed, type ComputedRef } from 'vue';
+import { useRoute } from 'vue-router';
 
 const { settings } = useSettings();
+const route = useRoute();
 
-const activeView = ref(settings.value.defaultView);
+const activeView: ComputedRef<CalendarView> = computed(() => {
+  const param = route.params.view;
+  if (!param) {
+    return settings.value.defaultView;
+  }
+  const viewParam = Array.isArray(param) ? param[0] : String(param); // convert to string
+
+  if (calendarViewValues.includes(viewParam as CalendarView)) {
+    return viewParam as CalendarView;
+  }
+  return settings.value.defaultView;
+});
+
 const views = {
   week: WeekDisplay,
   '4days': null,
   month: null,
 };
-
-const today = DateTime.now();
-const weekNumber = ref(0);
-
-const startOfTheWeek = computed(() => {
-  const diff = (today.weekday - settings.value.weekStart + 7) % 7;
-  let startDate = today.minus({ days: diff });
-
-  if (weekNumber.value !== 0) startDate = startDate.set({ weekNumber: weekNumber.value });
-
-  startDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 }); // maybe not needed
-  return startDate;
-});
-
-function changeWeek(weekNum: number) {
-  weekNumber.value = weekNum;
-}
 </script>
 
 <template>
   <div id="calendar-view">
     <SideBar>
-      <MonthSideMap
-        :year="startOfTheWeek.year"
-        :month-number="startOfTheWeek.month"
-        :highlighted-week-number="startOfTheWeek.weekNumber"
-        @change-week="changeWeek"
-      />
+      <MonthSideMap />
     </SideBar>
-    <component :is="views[activeView]" :start-date="startOfTheWeek"></component>
+    <TopBar></TopBar>
+    <component :is="views[activeView]"></component>
   </div>
 </template>
 
@@ -51,9 +45,15 @@ function changeWeek(weekNum: number) {
 #calendar-view {
   display: grid;
   grid-template-columns: var(--sidebar-width) auto;
-  grid-template-rows: var(--);
-  grid-auto-flow: row;
+  grid-template-rows: var(--topbar-height) auto;
+  grid-template-areas:
+    'sidebar topbar'
+    'sidebar content';
 
   height: 100%;
+}
+
+component {
+  background-color: red;
 }
 </style>

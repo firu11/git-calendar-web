@@ -1,41 +1,48 @@
 <script setup lang="ts">
 import { useTranslation } from '@/composables/useTranslation';
+import router from '@/router';
+import { getCurrentViewDatetime } from '@/utils';
 import { DateTime } from 'luxon';
 import { computed, ref, watch } from 'vue';
+import { FiChevronDown, FiChevronUp } from 'vue-icons-plus/fi';
+import { useRoute } from 'vue-router';
 
 const { monthNameLong } = useTranslation();
-
-interface Props {
-  year: number;
-  monthNumber: number;
-  highlightedWeekNumber: number;
-}
-const props = defineProps<Props>();
-
-const emit = defineEmits(['change-week']);
+const route = useRoute();
 
 watch(
-  () => props.monthNumber,
+  () => route.params,
   () => {
-    monthNumberTracker.value = props.monthNumber;
-    yearTracker.value = props.year;
+    currentDatetime.value = getCurrentViewDatetime(route.params);
+
+    monthNumberTracker.value = currentDatetime.value.month;
+    yearTracker.value = currentDatetime.value.year;
   },
 );
 
-const monthNumberTracker = ref(props.monthNumber);
-const yearTracker = ref(props.year);
+const currentDatetime = ref(getCurrentViewDatetime(route.params));
+
+const highlightedWeekNum = computed(() => {
+  return currentDatetime.value.weekNumber;
+});
+
+const monthNumberTracker = ref(currentDatetime.value.month);
+const yearTracker = ref(currentDatetime.value.year);
 
 function changeMonthNum(up: boolean) {
-  if (up) monthNumberTracker.value++;
-  else monthNumberTracker.value--;
+  let monthNum = Number(route.params.month);
+  let yearNum = Number(route.params.year);
+
+  if (up) monthNum++;
+  else monthNum--;
 
   // handle year jumps
-  if (monthNumberTracker.value >= 13) {
-    monthNumberTracker.value = 1;
-    yearTracker.value++;
-  } else if (monthNumberTracker.value <= 0) {
-    monthNumberTracker.value = 12;
-    yearTracker.value--;
+  if (monthNum >= 13) {
+    monthNum = 1;
+    yearNum++;
+  } else if (monthNum <= 0) {
+    monthNum = 12;
+    yearNum--;
   }
 }
 
@@ -75,8 +82,8 @@ const weeks = computed(() => {
         {{ `${monthNameLong(DateTime.now().set({ month: monthNumberTracker }))} ${yearTracker}` }}
       </span>
       <span id="month-nav">
-        <button @click="changeMonthNum(false)">&lt;</button>
-        <button @click="changeMonthNum(true)">&gt;</button>
+        <button @click="changeMonthNum(false)"><FiChevronUp /></button>
+        <button @click="changeMonthNum(true)"><FiChevronDown /></button>
       </span>
     </div>
 
@@ -89,8 +96,8 @@ const weeks = computed(() => {
         v-for="(week, wIndex) in weeks"
         :key="wIndex"
         class="week-row"
-        :class="{ 'highlighted-week': week[0]?.weekNumber == props.highlightedWeekNumber }"
-        @click="emit('change-week', week[0]?.weekNumber)"
+        :class="{ 'highlighted-week': week[0]?.weekNumber == highlightedWeekNum }"
+        @click="router.replace({ params: { month: week[0]?.month, day: week[0]?.day } })"
       >
         <div
           v-for="d in week"
@@ -131,6 +138,7 @@ const weeks = computed(() => {
   button {
     width: 1.8rem;
     height: 1.8rem;
+    padding: 7%;
     font-weight: 900;
     border-radius: var(--small-border-radius);
 

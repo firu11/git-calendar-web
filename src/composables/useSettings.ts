@@ -7,8 +7,10 @@ export function useSettings() {
   return { settings };
 }
 
+export const calendarViewValues = ['4days', 'week', 'month'] as const;
+export type CalendarView = (typeof calendarViewValues)[number];
+
 type Theme = 'auto' | 'light' | 'dark';
-type CalendarView = '4days' | 'week' | 'month';
 type HourCycle = 'h12' | 'h24';
 type Lang = (typeof LANGUAGES)[number]['code'];
 

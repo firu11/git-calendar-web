@@ -6,17 +6,24 @@ import { useSettings } from '@/composables/useSettings';
 import { useTranslation } from '@/composables/useTranslation';
 import { DateTime } from 'luxon';
 import { CalendarCore } from '@/wasm/core-wrapper';
+import { getCurrentViewDatetime } from '@/utils';
+import { useRoute } from 'vue-router';
 
 const { settings } = useSettings();
 const { dayName } = useTranslation();
+const route = useRoute();
 
-interface Props {
-  startDate: DateTime;
-}
-const props = defineProps<Props>();
+const startDate = computed(() => {
+  const d = getCurrentViewDatetime(route.params);
+  const diff = (d.weekday - settings.value.weekStart + 7) % 7;
+  let startDate = d.minus({ days: diff });
+
+  startDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 }); // maybe not needed
+  return startDate;
+});
 
 watch(
-  () => props.startDate,
+  () => startDate.value,
   async () => {
     eventsByDay.value = await getEventsForWeek();
   },
@@ -24,7 +31,7 @@ watch(
 
 const weekDates = computed(() => {
   return Array.from({ length: 7 }, (_, i) => {
-    return props.startDate.plus({ days: i });
+    return startDate.value.plus({ days: i });
   });
 });
 
@@ -67,7 +74,7 @@ async function getEventsForWeek(): Promise<CalendarEvent[][]> {
     const eventDate = event.from.startOf('day');
 
     // calculate the difference in days
-    const diffInDays = eventDate.diff(props.startDate.startOf('day'), 'days').days;
+    const diffInDays = eventDate.diff(startDate.value.startOf('day'), 'days').days;
     const dayIndex = Math.floor(diffInDays);
 
     // add it to appropriate day
@@ -124,7 +131,7 @@ onMounted(async () => {
   grid-template-columns: 3rem auto;
   grid-template-rows: 2rem auto;
   grid-template-areas:
-    '- topbar'
+    '- datebar'
     'timebar content';
 
   position: relative;
@@ -146,7 +153,7 @@ onMounted(async () => {
 
 #top-bar {
   border-bottom: var(--grid-border);
-  grid-area: topbar;
+  grid-area: datebar;
 }
 
 #left-time-bar {

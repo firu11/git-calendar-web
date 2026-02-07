@@ -13,6 +13,10 @@ const { settings } = useSettings();
 const { dayName } = useTranslation();
 const route = useRoute();
 
+const props = defineProps<{
+  numOfDays: number;
+}>();
+
 const startDate = computed(() => {
   const d = getCurrentViewDatetime(route.params);
   const diff = (d.weekday - settings.value.weekStart + 7) % 7;
@@ -29,8 +33,8 @@ watch(
   },
 );
 
-const weekDates = computed(() => {
-  return Array.from({ length: 7 }, (_, i) => {
+const dates = computed(() => {
+  return Array.from({ length: props.numOfDays }, (_, i) => {
     return startDate.value.plus({ days: i });
   });
 });
@@ -63,7 +67,7 @@ const hoursOnGrid = computed(() => {
   return result;
 });
 
-const eventsByDay = ref<CalendarEvent[][]>(Array.from({ length: 7 }, () => []));
+const eventsByDay = ref<CalendarEvent[][]>(Array.from({ length: props.numOfDays }, () => []));
 
 async function getEventsForWeek(): Promise<CalendarEvent[][]> {
   const result: CalendarEvent[][] = Array.from({ length: 7 }, () => []);
@@ -92,9 +96,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div id="week-view-container">
+  <div id="view-container">
     <div id="top-bar">
-      <span v-for="day in weekDates" :key="day.day" :class="{ today: day.hasSame(DateTime.now(), 'day') }">{{
+      <span v-for="day in dates" :key="day.day" :class="{ today: day.hasSame(DateTime.now(), 'day') }">{{
         `${day.day}. ${dayName(day)}`
       }}</span>
     </div>
@@ -113,7 +117,7 @@ onMounted(async () => {
       </div>
 
       <DayTimeline
-        v-for="(d, i) in weekDates"
+        v-for="(d, i) in dates"
         :key="d.millisecond"
         :date="d"
         :num-of-hours="hoursOnGrid.length"
@@ -124,7 +128,7 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-#week-view-container {
+#view-container {
   height: calc(100% - 2rem);
 
   display: grid;
@@ -142,7 +146,7 @@ onMounted(async () => {
 #content {
   display: grid;
   grid-auto-flow: column;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
 }
 
 #content {

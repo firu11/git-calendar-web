@@ -87,12 +87,12 @@ onMounted(async () => {
 <template>
   <div id="week-view-container">
     <div id="top-bar">
-      <span v-for="day in weekDates" :class="{ today: day.hasSame(DateTime.now(), 'day') }">{{
+      <span v-for="day in weekDates" :key="day.day" :class="{ today: day.hasSame(DateTime.now(), 'day') }">{{
         `${day.day}. ${dayName(day)}`
       }}</span>
     </div>
     <div id="left-time-bar">
-      <span v-for="h in hoursOnGrid">{{ h }}</span>
+      <span v-for="h in hoursOnGrid" :key="h">{{ h }}</span>
     </div>
 
     <div id="content">
@@ -105,7 +105,13 @@ onMounted(async () => {
         ></div>
       </div>
 
-      <DayTimeline v-for="(d, i) in weekDates" :date="d" :numOfHours="hoursOnGrid.length" :events="eventsByDay[i]!" />
+      <DayTimeline
+        v-for="(d, i) in weekDates"
+        :key="d.millisecond"
+        :date="d"
+        :num-of-hours="hoursOnGrid.length"
+        :events="eventsByDay[i]!"
+      />
     </div>
   </div>
 </template>

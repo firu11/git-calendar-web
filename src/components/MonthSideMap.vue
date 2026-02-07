@@ -87,11 +87,11 @@ const weeks = computed(() => {
         v-for="(week, wIndex) in weeks"
         :key="wIndex"
         class="week-row"
-        :class="{ 'highlighted-week': week.some((d) => d.weekNumber === props.highlightedWeekNumber) }"
+        :class="{ 'highlighted-week': week[0]?.weekNumber == props.highlightedWeekNumber }"
       >
         <div
           v-for="d in week"
-          :key="d.toString()"
+          :key="d.day"
           class="day"
           :class="{
             today: d.hasSame(DateTime.now(), 'day'),

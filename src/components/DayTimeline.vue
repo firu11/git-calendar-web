@@ -47,7 +47,7 @@ const nonoverlappingGroups = computed(() => {
   <div class="day-timeline">
     <div class="timeline-grid">
       <div class="timeline-group" v-for="g in nonoverlappingGroups">
-        <TimelineEvent v-for="e in g" :key="e.id" :event="e" :numOfHours="props.numOfHours" />
+        <TimelineEvent v-for="e in g" :key="e.id" :event="e" :num-of-hours="props.numOfHours" />
       </div>
     </div>
   </div>

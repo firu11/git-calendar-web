@@ -29,7 +29,7 @@ const { dayNameLong } = useTranslation();
     <label>
       {{ $t('settings.weekStart') }}:
       <select name="week-start" v-model="settings.weekStart">
-        <option v-for="i in 7" :value="i">
+        <option v-for="i in 7" :key="i" :value="i">
           {{ dayNameLong(DateTime.now().set({ weekday: i as WeekdayNumbers })) }}
         </option>
       </select>

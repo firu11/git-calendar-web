@@ -1,26 +1,12 @@
 <script setup lang="ts">
-import { getCurrentViewDatetime } from '@/utils';
+import { moveView } from '@/utils';
 import { DateTime } from 'luxon';
 import { FiChevronLeft, FiChevronRight } from 'vue-icons-plus/fi';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 
-const route = useRoute();
 const router = useRouter();
 
 const today = DateTime.now();
-
-function move(back: boolean) {
-  const currentDatetime = getCurrentViewDatetime(route.params);
-  const sign = back ? -1 : 1;
-
-  switch (route.params.view) {
-    case 'month':
-    case 'week':
-      const newDate = currentDatetime.plus({ days: 7 * sign });
-      router.replace({ name: 'calendar', params: { year: newDate.year, month: newDate.month, day: newDate.day } });
-    case '4days':
-  }
-}
 </script>
 
 <template>
@@ -37,8 +23,8 @@ function move(back: boolean) {
       <router-link :to="{ name: 'calendar', params: { view: 'month' } }" :class="{ disabled: true }">Month</router-link>
     </div>
     <div id="view-nav-btns">
-      <button @click="move(true)"><FiChevronLeft /></button>
-      <button @click="move(false)"><FiChevronRight /></button>
+      <button @click="moveView(true, router)"><FiChevronLeft /></button>
+      <button @click="moveView(false, router)"><FiChevronRight /></button>
     </div>
   </header>
 </template>

@@ -8,6 +8,9 @@ import { calendarViewValues, useSettings, type CalendarView } from '@/composable
 import { computed, type ComputedRef } from 'vue';
 import { useRoute } from 'vue-router';
 
+import { useKeyboard } from '@/composables/useKeyboard';
+useKeyboard();
+
 const { settings } = useSettings();
 const route = useRoute();
 

@@ -11,13 +11,19 @@ export function useKeyboard() {
     onKeyStroke('t', (e) => {
       e.preventDefault();
       const today = DateTime.now();
-      router.replace({
-        params: {
-          year: today.year,
-          month: today.month,
-          day: today.day,
-        },
-      });
+      router.replace({ params: { year: today.year, month: today.month, day: today.day } });
+    });
+
+    // W -> switch to week view
+    onKeyStroke('w', (e) => {
+      e.preventDefault();
+      router.replace({ params: { view: 'week' } });
+    });
+
+    // M -> switch to month view
+    onKeyStroke('m', (e) => {
+      e.preventDefault();
+      router.replace({ params: { view: 'month' } });
     });
 
     // move view back

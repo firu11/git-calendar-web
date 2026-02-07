@@ -139,7 +139,6 @@ const weeks = computed(() => {
     width: 1.8rem;
     height: 1.8rem;
     padding: 7%;
-    font-weight: 900;
     border-radius: var(--small-border-radius);
 
     display: flex;

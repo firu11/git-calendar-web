@@ -12,6 +12,8 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const emit = defineEmits(['change-week']);
+
 watch(
   () => props.monthNumber,
   () => {
@@ -88,6 +90,7 @@ const weeks = computed(() => {
         :key="wIndex"
         class="week-row"
         :class="{ 'highlighted-week': week[0]?.weekNumber == props.highlightedWeekNumber }"
+        @click="emit('change-week', week[0]?.weekNumber)"
       >
         <div
           v-for="d in week"

@@ -16,15 +16,21 @@ const views = {
 };
 
 const today = DateTime.now();
-const offset = ref(0);
+const weekNumber = ref(0);
 
 const startOfTheWeek = computed(() => {
   const diff = (today.weekday - settings.value.weekStart + 7) % 7;
-  const startDate = today.minus({ days: diff, weeks: offset.value });
+  let startDate = today.minus({ days: diff });
+
+  if (weekNumber.value !== 0) startDate = startDate.set({ weekNumber: weekNumber.value });
 
   startDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 }); // maybe not needed
   return startDate;
 });
+
+function changeWeek(weekNum: number) {
+  weekNumber.value = weekNum;
+}
 </script>
 
 <template>
@@ -34,6 +40,7 @@ const startOfTheWeek = computed(() => {
         :year="startOfTheWeek.year"
         :month-number="startOfTheWeek.month"
         :highlighted-week-number="startOfTheWeek.weekNumber"
+        @change-week="changeWeek"
       />
     </SideBar>
     <component :is="views[activeView]" :start-date="startOfTheWeek"></component>

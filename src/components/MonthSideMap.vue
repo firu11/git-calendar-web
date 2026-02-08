@@ -15,7 +15,7 @@ watch(
   () => {
     currentDatetime.value = getCurrentViewDatetime(route.params);
 
-    monthNumberTracker.value = currentDatetime.value.month;
+    monthTracker.value = currentDatetime.value.month;
     yearTracker.value = currentDatetime.value.year;
   },
 );
@@ -26,28 +26,25 @@ const highlightedWeekNum = computed(() => {
   return currentDatetime.value.weekNumber;
 });
 
-const monthNumberTracker = ref(currentDatetime.value.month);
+const monthTracker = ref(currentDatetime.value.month);
 const yearTracker = ref(currentDatetime.value.year);
 
 function changeMonthNum(up: boolean) {
-  let monthNum = Number(route.params.month);
-  let yearNum = Number(route.params.year);
-
-  if (up) monthNum++;
-  else monthNum--;
+  if (up) monthTracker.value++;
+  else monthTracker.value--;
 
   // handle year jumps
-  if (monthNum >= 13) {
-    monthNum = 1;
-    yearNum++;
-  } else if (monthNum <= 0) {
-    monthNum = 12;
-    yearNum--;
+  if (monthTracker.value >= 13) {
+    monthTracker.value = 1;
+    yearTracker.value++;
+  } else if (monthTracker.value <= 0) {
+    monthTracker.value = 12;
+    yearTracker.value--;
   }
 }
 
 const days = computed(() => {
-  const firstOfTheMonth = DateTime.now().set({ year: yearTracker.value, month: monthNumberTracker.value, day: 1 });
+  const firstOfTheMonth = DateTime.now().set({ year: yearTracker.value, month: monthTracker.value, day: 1 });
 
   const result: DateTime[] = [];
 
@@ -79,7 +76,7 @@ const weeks = computed(() => {
   <div id="month-side-map">
     <div class="container">
       <span id="month-name">
-        {{ `${monthNameLong(DateTime.now().set({ month: monthNumberTracker }))} ${yearTracker}` }}
+        {{ `${monthNameLong(DateTime.now().set({ month: monthTracker }))} ${yearTracker}` }}
       </span>
       <span id="month-nav">
         <button @click="changeMonthNum(false)"><FiChevronUp /></button>
@@ -105,7 +102,7 @@ const weeks = computed(() => {
           class="day"
           :class="{
             today: d.hasSame(DateTime.now(), 'day'),
-            'not-this-month': d.month !== monthNumberTracker,
+            'not-this-month': d.month !== monthTracker,
           }"
         >
           {{ d.day }}

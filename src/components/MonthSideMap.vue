@@ -15,6 +15,13 @@ watch(
   () => {
     currentDatetime.value = getCurrentViewDatetime(route.params);
 
+    // if the week clicked is from the previous month, but has at least one day in the current -> dont change
+    if (
+      currentDatetime.value.month != monthTracker.value &&
+      currentDatetime.value.daysInMonth! - currentDatetime.value.day <= 7
+    )
+      return;
+
     monthTracker.value = currentDatetime.value.month;
     yearTracker.value = currentDatetime.value.year;
   },
@@ -94,7 +101,7 @@ const weeks = computed(() => {
         :key="wIndex"
         class="week-row"
         :class="{ 'highlighted-week': week[0]?.weekNumber == highlightedWeekNum }"
-        @click="router.replace({ params: { month: week[0]?.month, day: week[0]?.day } })"
+        @click="router.replace({ params: { year: week[0]?.year, month: week[0]?.month, day: week[0]?.day } })"
       >
         <div
           v-for="d in week"

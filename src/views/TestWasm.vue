@@ -42,5 +42,21 @@ div {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0.3rem;
+}
+
+button {
+  color: black;
+  padding: 0.3rem 0.7rem;
+  background-color: white;
+  border-radius: 3px;
+
+  &:hover {
+    background-color: #c1c1c1;
+  }
+
+  &:active {
+    background-color: gray;
+  }
 }
 </style>

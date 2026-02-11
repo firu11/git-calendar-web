@@ -3,6 +3,7 @@ import DaysDisplay from '@/components/DaysDisplay.vue';
 import SideBar from '@/components/SideBar.vue';
 import MonthSideMap from '@/components/MonthSideMap.vue';
 import TopBar from '@/components/TopBar.vue';
+import EventGroups from '@/components/EventGroups.vue';
 
 import { calendarViewValues, useSettings, type CalendarView } from '@/composables/useSettings';
 import { computed, type ComputedRef } from 'vue';
@@ -38,6 +39,7 @@ const views = {
   <div id="calendar-view">
     <SideBar>
       <MonthSideMap />
+      <EventGroups />
     </SideBar>
     <TopBar></TopBar>
     <component :is="views[activeView][0]" :num-of-days="views[activeView][1]" />

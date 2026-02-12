@@ -98,7 +98,7 @@ onMounted(async () => {
 <template>
   <div id="view-container">
     <div id="top-bar">
-      <span v-for="day in dates" :key="day.day" :class="{ today: day.hasSame(DateTime.now(), 'day') }">{{
+      <span v-for="day in dates" :key="day.toMillis()" :class="{ today: day.hasSame(DateTime.now(), 'day') }">{{
         `${day.day}. ${dayName(day)}`
       }}</span>
     </div>
@@ -118,7 +118,7 @@ onMounted(async () => {
 
       <DayTimeline
         v-for="(d, i) in dates"
-        :key="d.millisecond"
+        :key="d.toMillis()"
         :date="d"
         :num-of-hours="hoursOnGrid.length"
         :events="eventsByDay[i]!"

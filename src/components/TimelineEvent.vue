@@ -41,14 +41,14 @@ function timeRangeFormat(from: DateTime, to: DateTime): string {
 </script>
 
 <template>
-  <div class="timeline-event" :style="getEventStylePos(event)">
+  <div class="timeline-event" :style="getEventStylePos(event)" @click="console.log('TODO')">
     <span>{{ event.title }}</span>
     <br />
     <span>{{ timeRangeFormat(event.from, event.to) }}</span>
   </div>
 </template>
 
-<style scoped>
+<style>
 .timeline-event {
   position: absolute;
   left: 0;
@@ -61,5 +61,7 @@ function timeRangeFormat(from: DateTime, to: DateTime): string {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+
+  user-select: none;
 }
 </style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import DaysDisplay from '@/components/DaysDisplay.vue';
+import XDaysView from '@/components/XDaysView.vue';
 import SideBar from '@/components/SideBar.vue';
 import MonthSideMap from '@/components/MonthSideMap.vue';
 import TopBar from '@/components/TopBar.vue';
@@ -29,8 +29,8 @@ const activeView: ComputedRef<CalendarView> = computed(() => {
 });
 
 const views = {
-  week: [DaysDisplay, 7],
-  '4days': [null, 4], //[DaysDisplay, 4],
+  week: [XDaysView, 7],
+  '4days': [null, 4], //[XDaysView, 4],
   month: [null, null],
 };
 </script>

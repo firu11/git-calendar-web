@@ -1,0 +1,35 @@
+<script setup lang="ts">
+interface Props {
+  topStyle: string;
+  heightStyle: string;
+  title: string;
+  subtitle: string;
+}
+const props = defineProps<Props>();
+</script>
+
+<template>
+  <div class="timeline-event" :style="{ top: topStyle, height: heightStyle }" @click="console.log('TODO')">
+    <span>{{ title }}</span>
+    <br />
+    <span>{{ subtitle }}</span>
+  </div>
+</template>
+
+<style>
+.timeline-event {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background-color: rgba(100, 149, 237, 0.5);
+  border-left: 3px solid #6495ed;
+  padding: 0.2rem;
+  font-size: 0.75rem;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  user-select: none;
+}
+</style>

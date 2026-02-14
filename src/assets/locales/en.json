@@ -11,5 +11,12 @@
     "12hourFormat": "12-hour time",
     "24hourFormat": "24-hour time",
     "weekStart": "Week start"
-  }
+  },
+  "newEvent": "New Event",
+  "views": {
+    "4days": "4 days",
+    "week": "Week",
+    "month": "Month"
+  },
+  "todayBtn": "Today"
 }

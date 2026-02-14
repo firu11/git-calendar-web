@@ -41,7 +41,7 @@ const views = {
       <MonthSideMap />
       <EventGroups />
     </SideBar>
-    <TopBar></TopBar>
+    <TopBar />
     <component :is="views[activeView][0]" :num-of-days="views[activeView][1]" />
   </div>
 </template>

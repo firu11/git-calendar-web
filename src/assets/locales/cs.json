@@ -11,5 +11,12 @@
     "12hourFormat": "12ti hodinový čas",
     "24hourFormat": "24ti hodinový čas",
     "weekStart": "Začátek týdne"
-  }
+  },
+  "newEvent": "Nová událost",
+  "views": {
+    "4days": "4 dny",
+    "week": "Týden",
+    "month": "Měsíc"
+  },
+  "todayBtn": "Dnes"
 }

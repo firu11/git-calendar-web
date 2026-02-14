@@ -14,13 +14,17 @@ const today = DateTime.now();
     <slot />
     <div id="view-btns">
       <router-link :to="{ name: 'calendar', params: { year: today.year, month: today.month, day: today.day } }">
-        Today
+        {{ $t('todayBtn') }}
       </router-link>
       <router-link :to="{ name: 'calendar', params: { view: '4days' } }" :class="{ disabled: true }">
-        4 Days
+        {{ $t('views.4days') }}
       </router-link>
-      <router-link :to="{ name: 'calendar', params: { view: 'week' } }">Week</router-link>
-      <router-link :to="{ name: 'calendar', params: { view: 'month' } }" :class="{ disabled: true }">Month</router-link>
+      <router-link :to="{ name: 'calendar', params: { view: 'week' } }">
+        {{ $t('views.week') }}
+      </router-link>
+      <router-link :to="{ name: 'calendar', params: { view: 'month' } }" :class="{ disabled: true }">
+        {{ $t('views.month') }}
+      </router-link>
     </div>
     <div id="view-nav-btns">
       <button @click="moveView(true, router)"><FiChevronLeft /></button>

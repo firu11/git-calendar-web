@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { DateTime } from 'luxon';
 import type { CalendarEvent } from '@/types/core';
 import { useSettings } from '@/composables/useSettings';
+import BaseEvent from '@/components/BaseEvent.vue';
+import { timeRangeFormat } from '@/utils';
 
 const { settings } = useSettings();
 
@@ -31,21 +32,15 @@ function getEventStylePos(e: CalendarEvent) {
     height: `${(pos.end - pos.start) * 100}%`,
   };
 }
-
-// Formats times based on timeFormat (17/5 pm) and puts it together like: '10:00 - 11:30'.
-function timeRangeFormat(from: DateTime, to: DateTime): string {
-  const fromTime = from.toLocaleString({ hour: '2-digit', minute: '2-digit', hourCycle: settings.value.timeFormat });
-  const toTime = to.toLocaleString({ hour: '2-digit', minute: '2-digit', hourCycle: settings.value.timeFormat });
-  return `${fromTime} - ${toTime}`;
-}
 </script>
 
 <template>
-  <div class="timeline-event" :style="getEventStylePos(event)" @click="console.log('TODO')">
-    <span>{{ event.title }}</span>
-    <br />
-    <span>{{ timeRangeFormat(event.from, event.to) }}</span>
-  </div>
+  <BaseEvent
+    :top-style="getEventStylePos(event).top"
+    :height-style="getEventStylePos(event).height"
+    :title="event.title"
+    :subtitle="timeRangeFormat(event.from, event.to)"
+  />
 </template>
 
 <style>

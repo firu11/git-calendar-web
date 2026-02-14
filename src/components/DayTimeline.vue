@@ -4,8 +4,15 @@ import type { CalendarEvent } from '@/types/core.ts';
 import { DateTime } from 'luxon';
 import TimelineEvent from '@/components/TimelineEvent.vue';
 import { useMouse } from '@vueuse/core';
+import BaseEvent from '@/components/BaseEvent.vue';
+import { timeRangeFormat } from '@/utils';
+import { useSettings } from '@/composables/useSettings';
 
-const { x, y, sourceType } = useMouse();
+// TODO
+// - mobile press-hold-drag
+// - multi day event create with horizontal drag
+const { y } = useMouse(); // const { x, y, sourceType } = useMouse();
+const { settings } = useSettings();
 
 interface Props {
   date: DateTime;
@@ -47,17 +54,36 @@ const nonoverlappingGroups = computed(() => {
 
 const timelineRef = useTemplateRef('timeline-ref');
 const drag = ref({ active: false, startY: 0 });
-const placeholderEventStyle = computed(() => {
-  const snapToGridHeight = timelineRef.value?.clientHeight! / props.numOfHours / 2;
-  let heightSnap = y.value - timelineRef.value!.getBoundingClientRect().y - drag.value.startY;
+
+const placeholderHeight = computed(() => {
+  if (timelineRef.value === null) return '';
+
+  const snapToGridHeight = timelineRef.value.clientHeight! / props.numOfHours / 2;
+  let heightSnap = y.value - timelineRef.value.getBoundingClientRect().y - drag.value.startY;
 
   heightSnap = Math.max(1 * snapToGridHeight, heightSnap);
   heightSnap = Math.floor(heightSnap / snapToGridHeight) * snapToGridHeight;
 
-  return {
-    top: `${drag.value.startY}px`,
-    height: `${heightSnap}px`,
-  };
+  return `${heightSnap}px`;
+});
+
+const placeholderSubtitle = computed(() => {
+  if (timelineRef.value === null) return '';
+
+  const startTimelinePercentage = drag.value.startY / timelineRef.value.getBoundingClientRect().height;
+  const startTime = DateTime.now().set({
+    hour: settings.value.dayViewStartHour + Math.floor(startTimelinePercentage * props.numOfHours),
+    minute: Math.round(((startTimelinePercentage * props.numOfHours) % 1) + 0.1) * 30, // ew
+  });
+
+  const endTimelinePercentage =
+    (y.value - timelineRef.value.getBoundingClientRect().y) / timelineRef.value.getBoundingClientRect().height;
+  const endTime = DateTime.now().set({
+    hour: settings.value.dayViewStartHour + Math.floor(endTimelinePercentage * props.numOfHours),
+    minute: Math.round(((endTimelinePercentage * props.numOfHours) % 1) + 0.1) * 30,
+  });
+
+  return timeRangeFormat(startTime, endTime);
 });
 
 function dragStart(e: PointerEvent) {
@@ -81,17 +107,25 @@ function dragStop(_: MouseEvent) {
 
   drag.value.active = false;
 
-  const endY = y.value - timelineRef.value!.getBoundingClientRect().y;
-  let distance = endY - drag.value.startY;
+  // const endY = y.value - timelineRef.value!.getBoundingClientRect().y;
+  // let distance = endY - drag.value.startY;
+
+  // TODO show popup
 
   window.removeEventListener('pointerup', dragStop); // cleanup
 }
 </script>
 
 <template>
-  <div class="day-timeline" :class="{ 'drag-cursor': drag.active }" @pointerdown="dragStart" ref="timeline-ref">
+  <div class="day-timeline" :class="{ 'dragging-cursor': drag.active }" @pointerdown="dragStart" ref="timeline-ref">
     <div class="timeline-grid">
-      <div class="timeline-event placeholder" v-if="drag.active" :style="placeholderEventStyle" />
+      <BaseEvent
+        v-show="drag.active"
+        :top-style="`${drag.startY}px`"
+        :height-style="placeholderHeight"
+        :title="$t('newEvent')"
+        :subtitle="placeholderSubtitle"
+      />
 
       <div class="timeline-group" v-for="(g, i) in nonoverlappingGroups" :key="i">
         <TimelineEvent v-for="e in g" :key="e.id" :event="e" :num-of-hours="props.numOfHours" />
@@ -118,7 +152,7 @@ function dragStop(_: MouseEvent) {
   position: relative;
 }
 
-.drag-cursor {
+.dragging-cursor {
   cursor: ns-resize;
 }
 </style>

@@ -35,6 +35,7 @@ aside {
 #links {
   display: flex;
   flex-direction: column;
+  align-items: center;
   position: absolute;
   bottom: 2rem;
 }

@@ -62,7 +62,7 @@ const placeholderHeight = computed(() => {
   let heightSnap = y.value - timelineRef.value.getBoundingClientRect().y - drag.value.startY;
 
   heightSnap = Math.max(1 * snapToGridHeight, heightSnap);
-  heightSnap = Math.floor(heightSnap / snapToGridHeight) * snapToGridHeight;
+  heightSnap = Math.round(heightSnap / snapToGridHeight) * snapToGridHeight;
 
   return `${heightSnap}px`;
 });

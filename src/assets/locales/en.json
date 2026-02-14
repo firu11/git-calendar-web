@@ -18,5 +18,6 @@
     "week": "Week",
     "month": "Month"
   },
-  "todayBtn": "Today"
+  "todayBtn": "Today",
+  "tagsTitle": "Tags"
 }

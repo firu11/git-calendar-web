@@ -24,7 +24,7 @@ function checkboxName(groupName: string): string {
 
 <template>
   <div class="event-groups">
-    <span class="title">Tags:</span>
+    <span class="title">{{ $t('tagsTitle') }}:</span>
     <label v-for="group in groups" :key="group.name" class="group-label" :style="{ '--group-color': group.color }">
       <input
         type="checkbox"
@@ -75,10 +75,10 @@ function checkboxName(groupName: string): string {
 }
 
 .custom-checkbox {
-  width: 1rem;
-  height: 1rem;
+  width: 0.9rem;
+  height: 0.9rem;
   border-radius: var(--small-border-radius);
-  border: 3px solid var(--group-color);
+  border: 2px solid var(--group-color);
 }
 
 input:checked + .custom-checkbox {

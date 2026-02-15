@@ -2,9 +2,9 @@
 import { ref, computed, useTemplateRef } from 'vue';
 import type { CalendarEvent } from '@/types/core.ts';
 import { DateTime } from 'luxon';
-import TimelineEvent from '@/components/TimelineEvent.vue';
+import TimelineEvent from '@/components/timeline/TimelineEvent.vue';
 import { useMouse } from '@vueuse/core';
-import BaseEvent from '@/components/BaseEvent.vue';
+import BaseEvent from '@/components/timeline/BaseEvent.vue';
 import { timeRangeFormat } from '@/utils';
 import { useSettings } from '@/composables/useSettings';
 

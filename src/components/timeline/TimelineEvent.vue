@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CalendarEvent } from '@/types/core';
 import { useSettings } from '@/composables/useSettings';
-import BaseEvent from '@/components/BaseEvent.vue';
+import BaseEvent from '@/components/timeline/BaseEvent.vue';
 import { timeRangeFormat } from '@/utils';
 
 const { settings } = useSettings();

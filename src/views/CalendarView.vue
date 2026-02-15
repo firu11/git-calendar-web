@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import XDaysView from '@/components/XDaysView.vue';
+import XDaysView from '@/components/timeline/XDaysView.vue';
 import SideBar from '@/components/SideBar.vue';
 import MonthSideMap from '@/components/MonthSideMap.vue';
 import TopBar from '@/components/TopBar.vue';
-import EventGroups from '@/components/EventGroups.vue';
+import EventGroups from '@/components/timeline/EventGroups.vue';
 
 import { calendarViewValues, useSettings, type CalendarView } from '@/composables/useSettings';
 import { computed, type ComputedRef } from 'vue';
@@ -60,5 +60,19 @@ const views = {
 
 component {
   background-color: red;
+}
+
+/* mobile TODO better */
+@media (max-width: 768px) {
+  aside {
+    display: none !important;
+  }
+
+  #calendar-view {
+    grid-template-columns: auto;
+    grid-template-areas:
+      'topbar'
+      'content';
+  }
 }
 </style>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
-import DayTimeline from '@/components/DayTimeline.vue';
+import DayTimeline from '@/components/timeline/DayTimeline.vue';
 import type { CalendarEvent } from '@/types/core.ts';
 import { useSettings } from '@/composables/useSettings';
 import { useTranslation } from '@/composables/useTranslation';

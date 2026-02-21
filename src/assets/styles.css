@@ -33,6 +33,11 @@ a {
 
 button {
   cursor: pointer;
+
+  &:active {
+    transform: translateY(1px);
+    background-color: var(--btn-bg-color-hover);
+  }
 }
 
 input,
@@ -41,43 +46,48 @@ select,
 button {
   background-color: var(--btn-bg-color);
   color: var(--text-color);
-  border: 1px solid #333333;
+  border: none;
   border-radius: var(--small-border-radius);
   padding: 0.4rem 0.6rem;
-  font-size: 15px;
+  font-size: 0.9rem;
   font-family: inherit;
 
   /* remove default glow in some browsers */
   outline: none;
   box-shadow: none;
-
-  &:hover:not(:focus) {
-    border-color: #444444;
-    background-color: var(--btn-bg-color-hover);
-  }
 }
 
+/* subtle hover lift via surface change */
+input:hover:not(:focus),
+textarea:hover:not(:focus),
+select:hover:not(:focus),
+button:hover:not(:focus) {
+  background-color: var(--btn-bg-color-hover);
+}
+
+/* focus = inner glow instead of border */
+input:focus,
+textarea:focus,
+select:focus,
+button:focus-visible {
+  background-color: var(--btn-bg-color-hover);
+}
+
+/* placeholder */
 input::placeholder,
 textarea::placeholder {
-  color: #777777;
+  color: #888;
   opacity: 1;
 }
 
 /* icon inside time inputs */
 input::-webkit-calendar-picker-indicator {
   cursor: pointer;
-  opacity: 0.5;
+  opacity: 0.7;
+  filter: invert(0);
 }
 
 /* darken picker popup background */
 [data-theme='dark'] input {
   color-scheme: dark;
-}
-
-input:focus,
-textarea:focus,
-select:focus,
-button:active {
-  border-color: var(--git-color);
-  background-color: var(--btn-bg-color-hover);
 }

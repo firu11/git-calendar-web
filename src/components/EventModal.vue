@@ -113,7 +113,7 @@ const exampleCalendars = ref(['Main', 'Shared']); // TODO
       </div>
       -->
 
-      <textarea name="description" :placeholder="$t('event.description')" v-model="form.description" />
+      <textarea name="description" rows="3" :placeholder="$t('event.description')" v-model="form.description" />
 
       <div class="bottom-btns">
         <button type="button" @click="saveEvent">{{ $t('saveBtn') }}</button>
@@ -142,12 +142,17 @@ const exampleCalendars = ref(['Main', 'Shared']); // TODO
     width: 80%;
     max-width: 30rem;
     border-radius: var(--small-border-radius);
-    border: 1px solid #333333;
+    border: 1px solid var(--btn-bg-color-hover);
     background-color: var(--bg-color);
     display: flex;
     flex-direction: column;
     gap: 1rem;
     padding: 1rem;
+
+    textarea {
+      resize: vertical;
+      min-height: 2rem;
+    }
   }
 }
 

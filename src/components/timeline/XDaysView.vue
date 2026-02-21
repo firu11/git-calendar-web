@@ -71,7 +71,7 @@ const eventsByDay = ref<CalendarEvent[][]>(Array.from({ length: props.numOfDays 
 
 async function getEventsForWeek(): Promise<CalendarEvent[][]> {
   const result: CalendarEvent[][] = Array.from({ length: 7 }, () => []);
-  const events = await CalendarCore.getEvents(DateTime.now(), DateTime.now());
+  const events = await CalendarCore.getEvents(startDate.value, startDate.value.plus({ day: props.numOfDays }));
 
   for (const event of events) {
     // normalize to start of day

@@ -43,7 +43,7 @@ function getEventStylePos(e: CalendarEvent) {
   />
 </template>
 
-<style>
+<style scoped>
 .timeline-event {
   position: absolute;
   left: 0;
@@ -58,5 +58,6 @@ function getEventStylePos(e: CalendarEvent) {
   text-overflow: ellipsis;
 
   user-select: none;
+  cursor: pointer;
 }
 </style>

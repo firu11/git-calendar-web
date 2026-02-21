@@ -28,35 +28,35 @@ async function createEventAndLogIt() {
 </script>
 
 <template>
-  <div>
-    <button @click="CalendarCore.initialize()">Init</button>
-    <button @click="CalendarCore.delete()">Delete</button>
-    <button @click="CalendarCore.clone('https://github.com/firu11/personal-web')">Clone</button>
-    <br />
-    <button @click="createEventAndLogIt()">Create Event</button>
+  <div class="container">
+    <span>Git Testing:</span>
+    <div id="git-testing-btns">
+      <button @click="CalendarCore.initialize()">Init</button>
+      <button @click="CalendarCore.delete()">Delete</button>
+      <button @click="CalendarCore.clone('https://github.com/firu11/personal-web')">Clone</button>
+      <br />
+      <button @click="createEventAndLogIt()">Create Event</button>
+    </div>
   </div>
 </template>
 
 <style scoped>
-div {
+#git-testing-btns {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.3rem;
 }
 
-button {
-  color: black;
-  padding: 0.3rem 0.7rem;
-  background-color: white;
-  border-radius: 3px;
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 
-  &:hover {
-    background-color: #c1c1c1;
-  }
+  align-items: center;
 
-  &:active {
-    background-color: gray;
+  > span {
+    font-weight: 500;
   }
 }
 </style>

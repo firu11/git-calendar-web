@@ -40,6 +40,7 @@ const views = {
     <SideBar>
       <MonthSideMap />
       <EventGroups />
+      <TestWasm />
     </SideBar>
     <TopBar />
     <component :is="views[activeView][0]" :num-of-days="views[activeView][1]" />

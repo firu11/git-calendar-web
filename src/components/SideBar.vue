@@ -15,7 +15,6 @@ const slots = useSlots();
 
     <div id="links">
       <router-link to="/settings">settings</router-link>
-      <router-link to="/test">git testing</router-link>
     </div>
   </aside>
 </template>

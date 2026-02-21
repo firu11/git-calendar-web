@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import TestWasm from '@/views/TestWasm.vue';
 import CalendarView from '@/views/CalendarView.vue';
 import SettingsView from '@/views/SettingsView.vue';
 import { DateTime } from 'luxon';
@@ -17,7 +16,6 @@ const router = createRouter({
       component: CalendarView,
     },
     { path: '/settings', component: SettingsView },
-    { path: '/test', component: TestWasm },
     {
       path: '/:pathMatch(.*)*', // anything
       redirect: () => {

@@ -4,9 +4,10 @@ import router from '@/router.ts';
 import '@/assets/styles.css';
 import { CalendarCore } from '@/wasm/core-wrapper.ts';
 import '@/composables/useSettings.ts'; // init settings
-import { useTranslation } from './composables/useTranslation';
+import { useTranslation } from '@/composables/useTranslation';
 
 await CalendarCore.setCorsProxy('http://localhost:8000');
+await CalendarCore.initialize();
 
 const { i18n } = useTranslation();
 

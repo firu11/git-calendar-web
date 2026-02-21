@@ -12,12 +12,22 @@
     "24hourFormat": "24-hour time",
     "weekStart": "Week start"
   },
-  "newEvent": "New Event",
+  "event": {
+    "new": "New Event",
+    "title": "Title",
+    "description": "Description",
+    "location": "Location",
+    "from": "From",
+    "to": "To",
+    "wholeDay": "Whole day"
+  },
   "views": {
     "4days": "4 days",
     "week": "Week",
     "month": "Month"
   },
+  "saveBtn": "Save",
+  "closeBtn": "Close",
   "todayBtn": "Today",
   "tagsTitle": "Tags"
 }

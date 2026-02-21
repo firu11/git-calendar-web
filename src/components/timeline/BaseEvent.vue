@@ -9,7 +9,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-  <div class="timeline-event" :style="{ top: topStyle, height: heightStyle }" @click="console.log('TODO')">
+  <div class="timeline-event" :style="{ top: topStyle, height: heightStyle }">
     <span>{{ title }}</span>
     <br />
     <span>{{ subtitle }}</span>

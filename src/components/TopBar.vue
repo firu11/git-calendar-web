@@ -63,6 +63,10 @@ header {
 
     padding: 7%;
     border-radius: var(--small-border-radius);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-color);
 
     display: flex;
     align-items: center;

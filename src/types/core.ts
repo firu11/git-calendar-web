@@ -3,6 +3,7 @@ import { DateTime } from 'luxon';
 export interface CalendarEvent {
   id?: string;
   title: string;
+  description?: string;
   location?: string;
   from: DateTime;
   to: DateTime;

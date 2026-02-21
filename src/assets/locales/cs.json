@@ -12,12 +12,22 @@
     "24hourFormat": "24ti hodinový čas",
     "weekStart": "Začátek týdne"
   },
-  "newEvent": "Nová událost",
+  "event": {
+    "new": "Nová událost",
+    "title": "Jméno",
+    "description": "Popis",
+    "location": "Lokace",
+    "from": "Od",
+    "to": "Do",
+    "wholeDay": "Celý den"
+  },
   "views": {
     "4days": "4 dny",
     "week": "Týden",
     "month": "Měsíc"
   },
+  "saveBtn": "Uložit",
+  "closeBtn": "Zavřít",
   "todayBtn": "Dnes",
   "tagsTitle": "Štítky"
 }

@@ -4,10 +4,14 @@ import SideBar from '@/components/SideBar.vue';
 import MonthSideMap from '@/components/MonthSideMap.vue';
 import TopBar from '@/components/TopBar.vue';
 import EventGroups from '@/components/timeline/EventGroups.vue';
+import EventModal from '@/components/EventModal.vue';
+import TestWasm from '@/components/TestWasm.vue';
 
 import { calendarViewValues, useSettings, type CalendarView } from '@/composables/useSettings';
-import { computed, type ComputedRef } from 'vue';
+import { provide, ref, computed, type ComputedRef } from 'vue';
 import { useRoute } from 'vue-router';
+import { showEventModalKey } from '@/types/injectionKeys';
+import type { CalendarEvent } from '@/types/core';
 
 import { useKeyboard } from '@/composables/useKeyboard';
 useKeyboard();
@@ -33,6 +37,19 @@ const views = {
   '4days': [null, 4], //[XDaysView, 4],
   month: [null, null],
 };
+
+const showModal = ref(false);
+const editingEvent = ref<CalendarEvent | undefined>(undefined);
+function showEventModal(event?: CalendarEvent) {
+  if (event) editingEvent.value = event;
+  showModal.value = true;
+}
+
+function closeEventModal() {
+  showModal.value = false;
+}
+
+provide(showEventModalKey, showEventModal);
 </script>
 
 <template>
@@ -42,8 +59,11 @@ const views = {
       <EventGroups />
       <TestWasm />
     </SideBar>
+
     <TopBar />
     <component :is="views[activeView][0]" :num-of-days="views[activeView][1]" />
+
+    <EventModal v-show="showModal" :event="editingEvent" @close="closeEventModal" />
   </div>
 </template>
 

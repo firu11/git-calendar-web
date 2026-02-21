@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, useTemplateRef } from 'vue';
+import { ref, computed, useTemplateRef, inject } from 'vue';
 import type { CalendarEvent } from '@/types/core.ts';
 import { DateTime } from 'luxon';
 import TimelineEvent from '@/components/timeline/TimelineEvent.vue';
@@ -7,10 +7,12 @@ import { useMouse } from '@vueuse/core';
 import BaseEvent from '@/components/timeline/BaseEvent.vue';
 import { timeRangeFormat } from '@/utils';
 import { useSettings } from '@/composables/useSettings';
+import { showEventModalKey } from '@/types/injectionKeys';
 
 // TODO
 // - mobile press-hold-drag
 // - multi day event create with horizontal drag
+
 const { y } = useMouse(); // const { x, y, sourceType } = useMouse();
 const { settings } = useSettings();
 
@@ -20,6 +22,11 @@ interface Props {
   events: CalendarEvent[];
 }
 const props = defineProps<Props>();
+
+const editEventModal = inject(showEventModalKey);
+function onEventClick(event: CalendarEvent) {
+  editEventModal?.(event);
+}
 
 // expects events to be sorted by "from" beforehand in Wasm
 const nonoverlappingGroups = computed(() => {
@@ -52,43 +59,70 @@ const nonoverlappingGroups = computed(() => {
   return lanes;
 });
 
+// ------------ dragging ------------
+
 const timelineRef = useTemplateRef('timeline-ref');
 const drag = ref({ active: false, startY: 0 });
 
-const placeholderHeight = computed(() => {
-  if (timelineRef.value === null) return '';
-
-  const snapToGridHeight = timelineRef.value.clientHeight! / props.numOfHours / 2;
-  let heightSnap = y.value - timelineRef.value.getBoundingClientRect().y - drag.value.startY;
-
-  heightSnap = Math.max(1 * snapToGridHeight, heightSnap);
-  heightSnap = Math.round(heightSnap / snapToGridHeight) * snapToGridHeight;
-
-  return `${heightSnap}px`;
+const snapToGridHeight = computed(() => {
+  if (!timelineRef.value) return 0;
+  return timelineRef.value.clientHeight / props.numOfHours / 2; // 30 min grid
 });
 
+const snappedHeight = computed(() => {
+  if (!timelineRef.value) return 0;
+  let rawHeight = y.value - timelineRef.value.getBoundingClientRect().y - drag.value.startY;
+  rawHeight = Math.max(snapToGridHeight.value, rawHeight);
+  return Math.round(rawHeight / snapToGridHeight.value) * snapToGridHeight.value;
+});
+const placeholderHeight = computed(() => `${snappedHeight.value}px`);
+
 const placeholderSubtitle = computed(() => {
-  if (timelineRef.value === null) return '';
-
-  const startTimelinePercentage = drag.value.startY / timelineRef.value.getBoundingClientRect().height;
-  const startTime = DateTime.now().set({
-    hour: settings.value.dayViewStartHour + Math.floor(startTimelinePercentage * props.numOfHours),
-    minute: Math.round(((startTimelinePercentage * props.numOfHours) % 1) + 0.1) * 30, // ew
-  });
-
-  const endTimelinePercentage =
-    (y.value - timelineRef.value.getBoundingClientRect().y) / timelineRef.value.getBoundingClientRect().height;
-  const endTime = DateTime.now().set({
-    hour: settings.value.dayViewStartHour + Math.floor(endTimelinePercentage * props.numOfHours),
-    minute: Math.round(((endTimelinePercentage * props.numOfHours) % 1) + 0.1) * 30,
-  });
-
+  const [startTime, endTime] = getEventTimes();
   return timeRangeFormat(startTime, endTime);
 });
 
+function getEventTimes(): [DateTime, DateTime] {
+  if (!timelineRef.value) return [props.date, props.date];
+
+  // number of 30min slots from top
+  const startSlots = Math.round(drag.value.startY / snapToGridHeight.value);
+  const durationSlots = Math.round(snappedHeight.value / snapToGridHeight.value);
+
+  const endSlots = startSlots + durationSlots;
+
+  const startTotalMinutes = startSlots * 30;
+  const endTotalMinutes = endSlots * 30;
+
+  const startTime = props.date
+    .set({
+      hour: settings.value.dayViewStartHour,
+      minute: 0,
+    })
+    .plus({ minutes: startTotalMinutes });
+
+  const endTime = props.date
+    .set({
+      hour: settings.value.dayViewStartHour,
+      minute: 0,
+    })
+    .plus({ minutes: endTotalMinutes });
+
+  return [startTime, endTime];
+}
+
 function dragStart(e: PointerEvent) {
   if (drag.value.active) return; // already dragging
-  if ((e.target as Element).classList.contains('timeline-event')) return; // clicked on existing event
+
+  const targetClasses = (e.target as Element).classList;
+  if (
+    !(
+      targetClasses.contains('timeline-group') ||
+      targetClasses.contains('timeline-grid') ||
+      targetClasses.contains('day-timeline')
+    )
+  )
+    return; // clicked on existing event
 
   drag.value.active = true;
   const snapToGridHeight = timelineRef.value?.clientHeight! / props.numOfHours / 2;
@@ -107,10 +141,9 @@ function dragStop(_: MouseEvent) {
 
   drag.value.active = false;
 
-  // const endY = y.value - timelineRef.value!.getBoundingClientRect().y;
-  // let distance = endY - drag.value.startY;
-
-  // TODO show popup
+  const [startTime, endTime] = getEventTimes();
+  const event: CalendarEvent = { title: '', from: startTime, to: endTime };
+  editEventModal?.(event);
 
   window.removeEventListener('pointerup', dragStop); // cleanup
 }
@@ -123,12 +156,18 @@ function dragStop(_: MouseEvent) {
         v-show="drag.active"
         :top-style="`${drag.startY}px`"
         :height-style="placeholderHeight"
-        :title="$t('newEvent')"
+        :title="$t('event.new')"
         :subtitle="placeholderSubtitle"
       />
 
       <div class="timeline-group" v-for="(g, i) in nonoverlappingGroups" :key="i">
-        <TimelineEvent v-for="e in g" :key="e.id" :event="e" :num-of-hours="props.numOfHours" />
+        <TimelineEvent
+          v-for="e in g"
+          :key="e.id"
+          :event="e"
+          :num-of-hours="props.numOfHours"
+          @click="onEventClick(e)"
+        />
       </div>
     </div>
   </div>

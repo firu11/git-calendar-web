@@ -137,13 +137,16 @@ const weeks = computed(() => {
 
 #month-nav {
   display: flex;
-  gap: 0.2rem;
 
   button {
     width: 1.8rem;
     height: 1.8rem;
     padding: 7%;
     border-radius: var(--small-border-radius);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-color);
 
     display: flex;
     align-items: center;

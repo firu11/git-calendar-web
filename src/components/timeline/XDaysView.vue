@@ -91,8 +91,13 @@ async function getEventsForWeek(): Promise<CalendarEvent[][]> {
 }
 
 onMounted(async () => {
-  eventsByDay.value = await getEventsForWeek();
+  await updateData();
 });
+
+async function updateData() {
+  eventsByDay.value = await getEventsForWeek();
+}
+defineExpose({ updateData });
 </script>
 
 <template>

@@ -8,7 +8,7 @@ interface Props {
   event?: CalendarEvent;
 }
 const props = defineProps<Props>();
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'refresh-data']);
 
 const form = reactive({
   title: '',
@@ -59,6 +59,8 @@ async function saveEvent() {
     const e = await CalendarCore.createEvent(event);
     console.log('created event:', e);
   }
+
+  emit('refresh-data');
   emit('close');
 
   // TODO reload view to display changes

@@ -8,7 +8,7 @@ import EventModal from '@/components/EventModal.vue';
 import TestWasm from '@/components/TestWasm.vue';
 
 import { calendarViewValues, useSettings, type CalendarView } from '@/composables/useSettings';
-import { provide, ref, computed, type ComputedRef } from 'vue';
+import { provide, ref, computed, type ComputedRef, useTemplateRef } from 'vue';
 import { useRoute } from 'vue-router';
 import { showEventModalKey } from '@/types/injectionKeys';
 import type { CalendarEvent } from '@/types/core';
@@ -49,6 +49,11 @@ function closeEventModal() {
   showModal.value = false;
 }
 
+const viewComponent = useTemplateRef('calendar-view');
+function updateCallDown() {
+  viewComponent.value?.updateData();
+}
+
 provide(showEventModalKey, showEventModal);
 </script>
 
@@ -61,9 +66,9 @@ provide(showEventModalKey, showEventModal);
     </SideBar>
 
     <TopBar />
-    <component :is="views[activeView][0]" :num-of-days="views[activeView][1]" />
+    <component :is="views[activeView][0]" :num-of-days="views[activeView][1]" ref="calendar-view" />
 
-    <EventModal v-show="showModal" :event="editingEvent" @close="closeEventModal" />
+    <EventModal v-show="showModal" :event="editingEvent" @close="closeEventModal" @refresh-data="updateCallDown" />
   </div>
 </template>
 

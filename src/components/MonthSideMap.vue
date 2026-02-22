@@ -18,7 +18,7 @@ watch(
     // if the week clicked is from the previous month, but has at least one day in the current -> dont change
     if (
       currentDatetime.value.month != monthTracker.value &&
-      currentDatetime.value.daysInMonth! - currentDatetime.value.day <= 7
+      currentDatetime.value.daysInMonth! - currentDatetime.value.day <= 5
     )
       return;
 

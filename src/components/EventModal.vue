@@ -37,7 +37,7 @@ function updateFormFromEvent(event?: CalendarEvent) {
 }
 
 function reconstructEvent(): CalendarEvent {
-  let event = {} as CalendarEvent;
+  let event = props.event ?? ({} as CalendarEvent);
 
   event.title = form.title;
   event.location = form.location;

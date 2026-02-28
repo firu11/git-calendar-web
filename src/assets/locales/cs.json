@@ -14,7 +14,7 @@
   },
   "event": {
     "new": "Nová událost",
-    "title": "Jméno",
+    "title": "Název",
     "description": "Popis",
     "location": "Lokace",
     "from": "Od",

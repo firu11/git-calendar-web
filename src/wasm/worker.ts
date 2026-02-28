@@ -4,25 +4,37 @@ import './wasm_exec.js';
 declare const self: DedicatedWorkerGlobalScope;
 
 let go: any;
-let wasmReady = false;
+let wasmReadyPromise: Promise<void> | null = null;
 let opfsRootHandle: FileSystemDirectoryHandle | null = null;
 
 async function initWasm() {
-  if (wasmReady) return;
-  // create a opfs handle
-  await initOPFS();
+  // if we already started initializing, return the existing promise
+  if (wasmReadyPromise) return wasmReadyPromise;
 
-  // init Go glue
-  go = new (self as any).Go();
+  // init go wasm
+  wasmReadyPromise = (async () => {
+    await initOPFS();
 
-  // load and run Wasm
-  const response = await fetch('./core.wasm');
-  const buffer = await response.arrayBuffer();
-  const { instance } = await WebAssembly.instantiate(buffer, go.importObject);
+    go = new (self as any).Go();
 
-  // start Go (non-blocking)
-  go.run(instance);
-  wasmReady = true;
+    // create a promise that resolves when Go calls 'onWasmReady'
+    const onReady = new Promise<void>((resolve) => {
+      (self as any).onWasmReady = () => {
+        console.log('Go Wasm is fully initialized and callbacks registered.');
+        resolve();
+      };
+    });
+
+    const response = await fetch('./core.wasm');
+    const buffer = await response.arrayBuffer();
+    const { instance } = await WebAssembly.instantiate(buffer, go.importObject);
+
+    // start Go
+    go.run(instance);
+    await onReady;
+  })();
+
+  return wasmReadyPromise;
 }
 
 async function initOPFS() {
@@ -44,8 +56,13 @@ self.onmessage = async (e: MessageEvent) => {
     // convert args to JSON strings if they are objects
     const jsonArgs = args.map((a: any) => (typeof a === 'object' ? JSON.stringify(a) : a));
 
+    const wasmApi = (self as any).CalendarCore;
+    if (!wasmApi || !wasmApi[method]) {
+      throw new Error(`Method ${method} not found on CalendarCore`);
+    }
+
     // call the Go WASM method
-    let rawResult = await (self as any).CalendarCore[method](...jsonArgs);
+    let rawResult = await wasmApi[method](...jsonArgs);
 
     // unmarshall
     let processedResult = typeof rawResult === 'string' && rawResult !== '' ? JSON.parse(rawResult) : rawResult;

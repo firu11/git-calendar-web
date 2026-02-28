@@ -7,16 +7,18 @@ export interface CalendarEvent {
   location?: string;
   from: DateTime;
   to: DateTime;
+  calendar: string;
+  tag: string;
+  // TODO repeat
 }
 
 // A interface showing all the methods of CalendarCore.
 // The response types are all made async (Promise<T>) using Asyncify type.
 export interface CalendarApi {
-  initialize(): void;
-  clone(url: string): void;
-  delete(): void;
-
-  setCorsProxy(proxy: string): void;
+  createCalendar(name: string): void;
+  cloneCalendar(name: string, url: string): void;
+  removeCalendar(name: string): void;
+  listCalendars(): string[];
 
   createEvent(event: CalendarEvent): CalendarEvent;
   updateEvent(event: CalendarEvent): CalendarEvent;
@@ -24,4 +26,6 @@ export interface CalendarApi {
 
   getEvent(id: string): CalendarEvent;
   getEvents(from: DateTime, to: DateTime): CalendarEvent[];
+
+  setCorsProxy(url: string): void;
 }

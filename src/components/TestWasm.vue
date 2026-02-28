@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { CalendarCore } from '@/wasm/core-wrapper';
 import { onMounted } from 'vue';
-import { DateTime } from 'luxon';
 
 onMounted(async () => {
   // const uid = uuidv4();
@@ -15,28 +14,18 @@ onMounted(async () => {
   // let e: CalendarEvent = await CalendarCore.getEvent(uid);
   // console.log(e.from.hour);
 });
-
-async function createEventAndLogIt() {
-  const start = DateTime.now().set({ hour: 10, minute: 0 });
-  const newEvent = await CalendarCore.createEvent({
-    from: start,
-    to: start.plus({ hour: 2 }),
-    title: 'Meeting',
-  });
-
-  console.log('created an event:', newEvent);
-}
 </script>
 
 <template>
   <div class="container">
     <span>Git Testing:</span>
     <div id="git-testing-btns">
-      <button @click="CalendarCore.initialize()">Init</button>
-      <button @click="CalendarCore.delete()">Delete</button>
-      <button @click="CalendarCore.clone('https://github.com/firu11/personal-web')">Clone</button>
+      <button @click="CalendarCore.createCalendar('Main')">Create Main cal</button>
+      <button @click="CalendarCore.removeCalendar('Main')">Delete Main cal</button>
+      <button @click="CalendarCore.cloneCalendar('personal-web', 'https://github.com/firu11/personal-web')">
+        Clone
+      </button>
       <br />
-      <button @click="createEventAndLogIt()">Create Event (today 10:00)</button>
     </div>
   </div>
 </template>

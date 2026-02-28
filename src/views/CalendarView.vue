@@ -3,7 +3,7 @@ import XDaysView from '@/components/timeline/XDaysView.vue';
 import SideBar from '@/components/SideBar.vue';
 import MonthSideMap from '@/components/MonthSideMap.vue';
 import TopBar from '@/components/TopBar.vue';
-import EventGroups from '@/components/timeline/EventGroups.vue';
+import EventGroups from '@/components/EventTags.vue';
 import EventModal from '@/components/EventModal.vue';
 import TestWasm from '@/components/TestWasm.vue';
 

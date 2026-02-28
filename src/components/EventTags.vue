@@ -1,47 +1,47 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-interface Group {
+interface Tag {
   name: string;
   checked: boolean;
   color: string;
 }
 
-const groups = ref<Group[]>([
+const tags = ref<Tag[]>([
   { name: 'School', checked: true, color: '#3b82f6' },
   { name: 'Work', checked: true, color: '#10b981' },
   { name: 'Birthdays', checked: true, color: '#ef4444' },
 ]);
 
-function toggleChecked(group: Group) {
-  group.checked = !group.checked;
+function toggleChecked(tag: Tag) {
+  tag.checked = !tag.checked;
 }
 
-function checkboxName(groupName: string): string {
-  return `group-${groupName.toLowerCase()}`;
+function checkboxName(tagName: string): string {
+  return `tag-${tagName.toLowerCase()}`;
 }
 </script>
 
 <template>
-  <div class="event-groups">
+  <div class="event-tags">
     <span class="title">{{ $t('tagsTitle') }}:</span>
-    <label v-for="group in groups" :key="group.name" class="group-label" :style="{ '--group-color': group.color }">
+    <label v-for="tag in tags" :key="tag.name" class="tag-label" :style="{ '--tag-color': tag.color }">
       <input
         type="checkbox"
-        :id="checkboxName(group.name)"
-        :name="checkboxName(group.name)"
-        :checked="group.checked"
-        @change="toggleChecked(group)"
+        :id="checkboxName(tag.name)"
+        :name="checkboxName(tag.name)"
+        :checked="tag.checked"
+        @change="toggleChecked(tag)"
         hidden
       />
       <span class="custom-checkbox" />
-      <span class="group-name">{{ group.name }}</span>
+      <span class="tag-name">{{ tag.name }}</span>
     </label>
   </div>
 </template>
 
 <style scoped>
-.event-groups {
+.event-tags {
   width: 100%;
 
   display: flex;
@@ -54,7 +54,7 @@ function checkboxName(groupName: string): string {
   }
 }
 
-.group-label {
+.tag-label {
   display: flex;
   align-items: center;
   gap: 0.7rem;
@@ -70,7 +70,7 @@ function checkboxName(groupName: string): string {
   }
 }
 
-.group-name {
+.tag-name {
   font-weight: 500;
 }
 
@@ -78,10 +78,10 @@ function checkboxName(groupName: string): string {
   width: 0.9rem;
   height: 0.9rem;
   border-radius: var(--small-border-radius);
-  border: 2px solid var(--group-color);
+  border: 2px solid var(--tag-color);
 }
 
 input:checked + .custom-checkbox {
-  background-color: var(--group-color);
+  background-color: var(--tag-color);
 }
 </style>

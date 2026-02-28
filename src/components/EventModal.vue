@@ -18,6 +18,7 @@ const form = reactive({
   fromTime: '',
   toDate: '',
   toTime: '',
+  calendar: '',
   wholeDay: false,
 });
 
@@ -34,6 +35,8 @@ function updateFormFromEvent(event?: CalendarEvent) {
 
   form.fromTime = event.from.toISOTime({ includeOffset: false, precision: 'minute' }) ?? '';
   form.toTime = event.to.toISOTime({ includeOffset: false, precision: 'minute' }) ?? '';
+
+  form.calendar = event.calendar;
 }
 
 function reconstructEvent(): CalendarEvent {
@@ -44,6 +47,8 @@ function reconstructEvent(): CalendarEvent {
 
   event.from = DateTime.fromISO(`${form.fromDate}T${form.fromTime}`);
   event.to = DateTime.fromISO(`${form.toDate}T${form.toTime}`);
+
+  event.calendar = form.calendar;
 
   return event;
 }
@@ -99,8 +104,8 @@ const exampleCalendars = ref(['Main', 'Shared']); // TODO
 
       <input type="text" name="location" :placeholder="$t('event.location')" v-model="form.location" />
 
-      <select name="calendar" id="">
-        <option v-for="calendarName in exampleCalendars" value="calendarName" :key="calendarName">
+      <select name="calendar" id="" v-model="form.calendar">
+        <option v-for="calendarName in exampleCalendars" :value="calendarName" :key="calendarName">
           {{ calendarName }}
         </option>
       </select>

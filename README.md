@@ -9,4 +9,8 @@ Icon pack used: https://vue-icons.com/icons/fi
 
 ### TODO
 - [ ] logo (git + calendar ?)
-- [ ] drag to create event
+- [x] drag to create event
+- [ ] multiple calendars
+- [ ] tags
+- [ ] repetition
+- [ ] multi-day events bar

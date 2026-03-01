@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+interface Props {
+  tags: string[];
+}
+const props = defineProps<Props>();
+
+// TODO watch etc
+
 interface Tag {
   name: string;
   checked: boolean;
@@ -24,7 +31,6 @@ function checkboxName(tagName: string): string {
 
 <template>
   <div class="event-tags">
-    <span class="title">{{ $t('tagsTitle') }}:</span>
     <label v-for="tag in tags" :key="tag.name" class="tag-label" :style="{ '--tag-color': tag.color }">
       <input
         type="checkbox"

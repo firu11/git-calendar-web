@@ -1,4 +1,4 @@
-# Git Calendar Web
+# Git Calendar Web Client
 A web client for [git-calendar/core](https://github.com/git-calendar/core)
 
 ### A must-have for debugging git/file operations

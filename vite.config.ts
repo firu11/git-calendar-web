@@ -12,4 +12,10 @@ export default defineConfig({
     },
   },
   base: process.env.GITHUB_PAGES == 'true' ? '/web-client/' : '/',
+  server: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    },
+  },
 });

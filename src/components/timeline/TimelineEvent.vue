@@ -2,12 +2,11 @@
 import type { CalendarEvent } from '@/types/core';
 import { useSettings } from '@/composables/useSettings';
 import BaseEvent from '@/components/timeline/BaseEvent.vue';
-import { timeRangeFormat } from '@/utils';
+import { numberOfHours, timeRangeFormat } from '@/utils';
 
 const { settings } = useSettings();
 
 interface Props {
-  numOfHours: number;
   event: CalendarEvent;
 }
 const props = defineProps<Props>();
@@ -18,8 +17,8 @@ function getEventPosition(event: CalendarEvent): { start: number; end: number } 
   const eventEndHours = event.to.hour + event.to.minute / 60;
   const viewStart = settings.value.dayViewStartHour;
 
-  const start = Math.max(0, (eventStartHours - viewStart) / props.numOfHours);
-  const end = Math.min(1, (eventEndHours - viewStart) / props.numOfHours);
+  const start = Math.max(0, (eventStartHours - viewStart) / numberOfHours());
+  const end = Math.min(1, (eventEndHours - viewStart) / numberOfHours());
 
   return { start, end };
 }
@@ -45,19 +44,6 @@ function getEventStylePos(e: CalendarEvent) {
 
 <style scoped>
 .timeline-event {
-  position: absolute;
-  left: 0;
-  right: 0;
-  background-color: rgba(100, 149, 237, 0.5);
-  border-left: 3px solid #6495ed;
-  padding: 0.2rem;
-  font-size: 0.75rem;
-
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-
-  user-select: none;
   cursor: pointer;
 }
 </style>

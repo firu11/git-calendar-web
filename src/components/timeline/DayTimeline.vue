@@ -5,9 +5,10 @@ import { DateTime } from 'luxon';
 import TimelineEvent from '@/components/timeline/TimelineEvent.vue';
 import { useMouse } from '@vueuse/core';
 import BaseEvent from '@/components/timeline/BaseEvent.vue';
-import { timeRangeFormat } from '@/utils';
+import { numberOfHours, timeRangeFormat } from '@/utils';
 import { useSettings } from '@/composables/useSettings';
 import { showEventModalKey } from '@/types/injectionKeys';
+import CursorToday from './CursorToday.vue';
 
 // TODO
 // - mobile press-hold-drag
@@ -18,7 +19,6 @@ const { settings } = useSettings();
 
 interface Props {
   date: DateTime;
-  numOfHours: number;
   events: CalendarEvent[];
 }
 const props = defineProps<Props>();
@@ -27,6 +27,11 @@ const editEventModal = inject(showEventModalKey);
 function onEventClick(event: CalendarEvent) {
   editEventModal?.(event);
 }
+
+const dateIsToday = computed(() => {
+  const today = DateTime.now();
+  return props.date.day === today.day && props.date.month === today.month && props.date.year === today.year;
+});
 
 // expects events to be sorted by "from" beforehand in Wasm
 const nonoverlappingGroups = computed(() => {
@@ -66,7 +71,7 @@ const drag = ref({ active: false, startY: 0 });
 
 const snapToGridHeight = computed(() => {
   if (!timelineRef.value) return 0;
-  return timelineRef.value.clientHeight / props.numOfHours / 2; // 30 min grid
+  return timelineRef.value.clientHeight / numberOfHours() / 2; // 30 min grid
 });
 
 const snappedHeight = computed(() => {
@@ -125,7 +130,7 @@ function dragStart(e: PointerEvent) {
     return; // clicked on existing event
 
   drag.value.active = true;
-  const snapToGridHeight = timelineRef.value?.clientHeight! / props.numOfHours / 2;
+  const snapToGridHeight = timelineRef.value?.clientHeight! / numberOfHours() / 2;
 
   let startY = y.value - timelineRef.value!.getBoundingClientRect().y;
   startY = Math.max(0, startY);
@@ -152,6 +157,7 @@ function dragStop(_: MouseEvent) {
 <template>
   <div class="day-timeline" :class="{ 'dragging-cursor': drag.active }" @pointerdown="dragStart" ref="timeline-ref">
     <div class="timeline-grid">
+      <!-- placeholder event for dragging -->
       <BaseEvent
         v-show="drag.active"
         :top-style="`${drag.startY}px`"
@@ -160,15 +166,12 @@ function dragStop(_: MouseEvent) {
         :subtitle="placeholderSubtitle"
       />
 
+      <!-- real events -->
       <div class="timeline-group" v-for="(g, i) in nonoverlappingGroups" :key="i">
-        <TimelineEvent
-          v-for="e in g"
-          :key="e.id"
-          :event="e"
-          :num-of-hours="props.numOfHours"
-          @click="onEventClick(e)"
-        />
+        <TimelineEvent v-for="e in g" :key="e.id" :event="e" @click="onEventClick(e)" />
       </div>
+
+      <CursorToday v-if="dateIsToday" />
     </div>
   </div>
 </template>

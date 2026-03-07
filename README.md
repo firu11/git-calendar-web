@@ -14,3 +14,4 @@ Icon pack used: https://vue-icons.com/icons/fi
 - [ ] tags
 - [ ] repetition
 - [ ] multi-day events bar
+- [ ] month view

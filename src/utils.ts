@@ -40,3 +40,15 @@ export function timeRangeFormat(from: DateTime, to: DateTime): string {
   const toTime = to.toLocaleString({ hour: '2-digit', minute: '2-digit', hourCycle: settings.value.timeFormat });
   return `${fromTime} - ${toTime}`;
 }
+
+export function numberOfHours(): number {
+  return (settings.value.dayViewEndHour - settings.value.dayViewStartHour + 24) % 24;
+}
+
+//
+export function timeInPercentOnTimeline(datetime: DateTime): number {
+  const viewStart = settings.value.dayViewStartHour;
+  const startHours = datetime.hour + datetime.minute / 60;
+  const percent = Math.max(0, (startHours - viewStart) / numberOfHours());
+  return percent;
+}

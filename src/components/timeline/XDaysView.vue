@@ -8,6 +8,7 @@ import { DateTime } from 'luxon';
 import { CalendarCore } from '@/wasm/core-wrapper';
 import { getCurrentViewDatetime } from '@/utils';
 import { useRoute } from 'vue-router';
+import CursorLine from './CursorLine.vue';
 
 const { settings } = useSettings();
 const { dayName } = useTranslation();
@@ -112,6 +113,8 @@ defineExpose({ updateData });
     </div>
 
     <div id="content">
+      <CursorLine />
+
       <div class="hour-lines">
         <div
           v-for="hour in hoursOnGrid.length"
@@ -121,13 +124,7 @@ defineExpose({ updateData });
         ></div>
       </div>
 
-      <DayTimeline
-        v-for="(d, i) in dates"
-        :key="d.toMillis()"
-        :date="d"
-        :num-of-hours="hoursOnGrid.length"
-        :events="eventsByDay[i]!"
-      />
+      <DayTimeline v-for="(d, i) in dates" :key="d.toMillis()" :date="d" :events="eventsByDay[i]!" />
     </div>
   </div>
 </template>
@@ -163,6 +160,10 @@ defineExpose({ updateData });
 #top-bar {
   border-bottom: var(--grid-border);
   grid-area: datebar;
+
+  span.today {
+    color: var(--git-color);
+  }
 }
 
 #left-time-bar {

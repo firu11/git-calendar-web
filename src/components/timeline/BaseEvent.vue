@@ -16,7 +16,7 @@ const props = defineProps<Props>();
   </div>
 </template>
 
-<style>
+<style scoped>
 .timeline-event {
   position: absolute;
   left: 0;

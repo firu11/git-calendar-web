@@ -178,7 +178,7 @@ const weeks = computed(() => {
     border-radius: var(--small-border-radius);
 
     &.highlighted-week {
-      background-color: var(--git-color) !important;
+      background-color: var(--git-bg-color) !important;
       color: var(--text-color-hard);
 
       .day.not-this-month {

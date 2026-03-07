@@ -29,6 +29,7 @@ function updateFormFromEvent(event?: CalendarEvent) {
 
   form.title = event.title;
   form.location = event.location!;
+  form.description = event.description!;
 
   form.fromDate = event.from.toISODate() ?? '';
   form.toDate = event.to.toISODate() ?? '';
@@ -44,6 +45,7 @@ function reconstructEvent(): CalendarEvent {
 
   event.title = form.title;
   event.location = form.location;
+  event.description = form.description;
 
   event.from = DateTime.fromISO(`${form.fromDate}T${form.fromTime}`);
   event.to = DateTime.fromISO(`${form.toDate}T${form.toTime}`);

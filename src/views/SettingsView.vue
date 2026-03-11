@@ -22,8 +22,8 @@ const { dayNameLong } = useTranslation();
     <label>
       {{ $t('settings.timeFormat') }}:
       <select name="time-format" v-model="settings.timeFormat">
-        <option value="h12">{{ $t('settings.12hourFormat') }}</option>
-        <option value="h24">{{ $t('settings.24hourFormat') }}</option>
+        <option value="h11">{{ $t('settings.12hourFormat') }}</option>
+        <option value="h23">{{ $t('settings.24hourFormat') }}</option>
       </select>
     </label>
     <label>

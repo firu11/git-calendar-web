@@ -11,7 +11,7 @@ export const calendarViewValues = ['4days', 'week', 'month'] as const;
 export type CalendarView = (typeof calendarViewValues)[number];
 
 type Theme = 'auto' | 'light' | 'dark';
-type HourCycle = 'h12' | 'h24';
+type HourCycle = 'h11' | 'h23';
 type Lang = (typeof LANGUAGES)[number]['code'];
 
 type UserSettings = {
@@ -30,7 +30,7 @@ const settings = useStorage<UserSettings>(
   {
     theme: 'auto',
     language: 'en',
-    timeFormat: 'h24',
+    timeFormat: 'h23',
     weekStart: 1, // monday
     defaultView: 'week',
     dayViewStartHour: 6,

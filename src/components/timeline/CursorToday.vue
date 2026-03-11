@@ -32,7 +32,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <span class="today-highlight" :style="{ top: topPos }"> </span>
+  <span class="today-highlight" :style="{ top: `calc(${topPos} - 2px` }"></span>
 </template>
 
 <style scoped>

@@ -42,11 +42,11 @@ onUnmounted(() => {
 <template>
   <span
     class="time"
-    :class="[settings.timeFormat === 'h12' ? 'time-12h' : 'time-24h']"
+    :class="[settings.timeFormat === 'h11' ? 'time-12h' : 'time-24h']"
     :style="{ top: `calc(${topPos} - 6px)` }"
     >{{ timeFormat }}</span
   >
-  <span class="line" :style="{ top: `calc(${topPos} + 2px)` }" />
+  <span class="line" :style="{ top: topPos }" />
 </template>
 
 <style scoped>

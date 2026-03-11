@@ -60,6 +60,10 @@ button {
   box-shadow: none;
 }
 
+textarea {
+  height: auto;
+}
+
 input:disabled,
 textarea:disabled,
 select:disabled,

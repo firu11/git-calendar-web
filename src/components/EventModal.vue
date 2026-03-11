@@ -160,7 +160,7 @@ onMounted(async () => {
   border: 1px solid var(--git-color);
   background-color: var(--btn-red-bg-color);
 
-  &:hover {
+  &:hover:not(:focus):not(:disabled) {
     background-color: var(--btn-red-bg-color-hover);
   }
 }

@@ -68,8 +68,8 @@ provide(openCalendarModalKey, openCalendarModal);
   <div id="calendar-view">
     <SideBar>
       <MonthSideMap />
-      <CalendarList ref="calendars-list" />
-      <TestWasm @refresh-data="updateCallDown" />
+      <CalendarList ref="calendars-list" @refresh-data="updateCallDown" />
+      <!-- <TestWasm @refresh-data="updateCallDown" /> -->
     </SideBar>
 
     <TopBar />

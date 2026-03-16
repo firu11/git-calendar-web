@@ -38,6 +38,7 @@ async function init() {
 
 async function clone() {
   await CalendarCore.cloneCalendar(form.url);
+  await CalendarCore.loadCalendars();
 
   resetForm();
   emit('refresh-data');

@@ -53,25 +53,27 @@ function reconstructEvent(): CalendarEvent {
   event.title = form.title;
   event.location = form.location;
   event.description = form.description;
-
-  event.from = DateTime.fromISO(`${form.fromDate}T${form.fromTime}`);
-  event.to = DateTime.fromISO(`${form.toDate}T${form.toTime}`);
-
   event.calendar = form.calendar;
+
+  if (form.wholeDay) {
+    event.from = DateTime.fromISO(`${form.fromDate}T00:00:00`);
+    event.to = DateTime.fromISO(`${form.toDate}T23:59:00`);
+  } else {
+    event.from = DateTime.fromISO(`${form.fromDate}T${form.fromTime}`);
+    event.to = DateTime.fromISO(`${form.toDate}T${form.toTime}`);
+  }
 
   return event;
 }
 
 async function saveEvent() {
   const event = reconstructEvent();
-  if (!thisModal.isEventNew.value) {
-    // already existed
-    const e = await CalendarCore.updateEvent(event);
-    console.log('updated event:', e);
-  } else {
-    // didnt exist; create
+  if (thisModal.isEventNew.value) {
     const e = await CalendarCore.createEvent(event);
     console.log('created event:', e);
+  } else {
+    const e = await CalendarCore.updateEvent(event);
+    console.log('updated event:', e);
   }
   emit('refresh-data');
   thisModal.close();
@@ -97,25 +99,24 @@ onMounted(async () => {
     <form>
       <input type="text" name="title" :placeholder="$t('event.title')" autocomplete="none" v-model="form.title" />
 
-      <div class="datetime">
+      <div class="dates">
         <span>{{ $t('event.from') }}:</span>
-        <input type="date" name="from-date" v-model="form.fromDate" />
-        <input type="time" name="from-time" v-model="form.fromTime" v-if="!form.wholeDay" />
-      </div>
+        <div class="datetime">
+          <input type="date" name="from-date" v-model="form.fromDate" />
+          <input type="time" name="from-time" v-model="form.fromTime" v-if="!form.wholeDay" />
+        </div>
 
-      <div class="datetime">
         <span>{{ $t('event.to') }}:</span>
-        <input type="date" name="to-date" v-model="form.toDate" />
-        <input type="time" name="to-time" v-model="form.toTime" v-if="!form.wholeDay" />
+        <div class="datetime">
+          <input type="date" name="to-date" v-model="form.toDate" />
+          <input type="time" name="to-time" v-model="form.toTime" v-if="!form.wholeDay" />
+        </div>
       </div>
 
-      <!--
-      TODO styling
       <label>
         {{ $t('event.wholeDay') }}
         <input type="checkbox" v-model="form.wholeDay" />
       </label>
-      -->
 
       <input
         type="text"
@@ -155,10 +156,21 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.dates {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.7rem;
+
+  > span {
+    align-self: center;
+  }
+}
+
 .datetime {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.7rem;
 }
 
 .delete-btn {

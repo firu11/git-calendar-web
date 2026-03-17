@@ -18,7 +18,7 @@
     "description": "Description",
     "location": "Location",
     "from": "From",
-    "to": "To",
+    "to": "Till",
     "wholeDay": "Whole day"
   },
   "calendar": {

@@ -8,7 +8,7 @@ import { DateTime } from 'luxon';
 import { CalendarCore } from '@/wasm/core-wrapper';
 import { getCurrentViewDatetime } from '@/utils';
 import { useRoute } from 'vue-router';
-import CursorLine from './CursorLine.vue';
+import CursorLine from '@/components/timeline/CursorLine.vue';
 
 const { settings } = useSettings();
 const { dayName } = useTranslation();
@@ -30,7 +30,7 @@ const startDate = computed(() => {
 watch(
   () => startDate.value,
   async () => {
-    eventsByDay.value = await getEventsForWeek();
+    updateData();
   },
 );
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, useTemplateRef, inject } from 'vue';
+import { ref, computed, useTemplateRef } from 'vue';
 import type { CalendarEvent } from '@/types/core.ts';
 import { DateTime } from 'luxon';
 import TimelineEvent from '@/components/timeline/TimelineEvent.vue';
@@ -7,8 +7,8 @@ import { useMouse } from '@vueuse/core';
 import BaseEvent from '@/components/timeline/BaseEvent.vue';
 import { numberOfHours, timeRangeFormat } from '@/utils';
 import { useSettings } from '@/composables/useSettings';
-import { openEventModalKey } from '@/types/injectionKeys';
-import CursorToday from './CursorToday.vue';
+import CursorToday from '@/components/timeline/CursorToday.vue';
+import { useEventModal } from '@/composables/useEventModal';
 
 // TODO
 // - mobile press-hold-drag
@@ -16,6 +16,7 @@ import CursorToday from './CursorToday.vue';
 
 const { y } = useMouse(); // const { x, y, sourceType } = useMouse();
 const { settings } = useSettings();
+const eventModal = useEventModal();
 
 interface Props {
   date: DateTime;
@@ -23,9 +24,8 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const editEventModal = inject(openEventModalKey);
 function onEventClick(event: CalendarEvent) {
-  editEventModal?.(event);
+  eventModal.open(event);
 }
 
 const dateIsToday = computed(() => {
@@ -148,7 +148,7 @@ function dragStop(_: MouseEvent) {
 
   const [startTime, endTime] = getEventTimes();
   const event: CalendarEvent = { title: '', from: startTime, to: endTime, calendar: 'main', tag: '' };
-  editEventModal?.(event);
+  eventModal.open(event);
 
   window.removeEventListener('pointerup', dragStop); // cleanup
 }

@@ -2,8 +2,10 @@
 import { reactive } from 'vue';
 import MultiToggle from '@/components/MultiToggle.vue';
 import { CalendarCore } from '@/wasm/core-wrapper';
+import { useCalendarModal } from '@/composables/useCalendarModal';
 
-const emit = defineEmits(['close', 'refresh-data']);
+const emit = defineEmits(['refresh-data']);
+const thisModal = useCalendarModal();
 
 const howOptions = ['Init', 'Clone'];
 const form = reactive({
@@ -33,7 +35,7 @@ async function init() {
 
   resetForm();
   emit('refresh-data');
-  emit('close');
+  thisModal.close();
 }
 
 async function clone() {
@@ -42,7 +44,7 @@ async function clone() {
 
   resetForm();
   emit('refresh-data');
-  emit('close');
+  thisModal.close();
 }
 
 function resetForm() {
@@ -76,7 +78,7 @@ function resetForm() {
 
       <div class="bottom-btns">
         <button type="button" @click="submit">{{ $t('saveBtn') }}</button>
-        <button type="button" @click="emit('close')">{{ $t('closeBtn') }}</button>
+        <button type="button" @click="thisModal.close">{{ $t('closeBtn') }}</button>
       </div>
     </form>
   </div>

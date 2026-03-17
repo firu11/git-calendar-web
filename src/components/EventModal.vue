@@ -3,12 +3,10 @@ import { ref, reactive, watch, onMounted } from 'vue';
 import { type CalendarEvent } from '@/types/core';
 import { DateTime } from 'luxon';
 import { CalendarCore } from '@/wasm/core-wrapper';
+import { useEventModal } from '@/composables/useEventModal';
 
-interface Props {
-  event?: CalendarEvent;
-}
-const props = defineProps<Props>();
-const emit = defineEmits(['close', 'refresh-data']);
+const emit = defineEmits(['refresh-data']);
+const thisModal = useEventModal();
 
 const form = reactive({
   title: '',
@@ -24,14 +22,20 @@ const form = reactive({
 
 const calendarNames = ref([] as string[]);
 
-watch(() => props.event, updateFormFromEvent, { immediate: true });
+watch(
+  () => thisModal.event,
+  (newEvent) => {
+    updateFormFromEvent(newEvent.value);
+  },
+  { immediate: true }, // fire right onMounted, not wait till first change
+);
 
-function updateFormFromEvent(event?: CalendarEvent) {
+function updateFormFromEvent(event: CalendarEvent | undefined) {
   if (!event) return;
 
   form.title = event.title;
-  form.location = event.location!;
-  form.description = event.description!;
+  form.location = event.location ?? '';
+  form.description = event.description ?? '';
 
   form.fromDate = event.from.toISODate() ?? '';
   form.toDate = event.to.toISODate() ?? '';
@@ -43,8 +47,9 @@ function updateFormFromEvent(event?: CalendarEvent) {
 }
 
 function reconstructEvent(): CalendarEvent {
-  let event = props.event ?? ({} as CalendarEvent);
+  const event = {} as CalendarEvent;
 
+  event.id = thisModal.event.value?.id;
   event.title = form.title;
   event.location = form.location;
   event.description = form.description;
@@ -59,7 +64,7 @@ function reconstructEvent(): CalendarEvent {
 
 async function saveEvent() {
   const event = reconstructEvent();
-  if (props.event != undefined && props.event.id != undefined) {
+  if (!thisModal.isEventNew.value) {
     // already existed
     const e = await CalendarCore.updateEvent(event);
     console.log('updated event:', e);
@@ -69,14 +74,14 @@ async function saveEvent() {
     console.log('created event:', e);
   }
   emit('refresh-data');
-  emit('close');
+  thisModal.close();
 }
 
 async function deleteEvent() {
   const event = reconstructEvent();
   await CalendarCore.removeEvent(event);
   emit('refresh-data');
-  emit('close');
+  thisModal.close();
 }
 
 onMounted(async () => {
@@ -140,8 +145,8 @@ onMounted(async () => {
 
       <div class="bottom-btns">
         <button type="button" @click="saveEvent">{{ $t('saveBtn') }}</button>
-        <button type="button" @click="emit('close')">{{ $t('closeBtn') }}</button>
-        <button v-if="event && event.id && event.id.length" type="button" @click="deleteEvent" class="delete-btn">
+        <button type="button" @click="thisModal.close">{{ $t('closeBtn') }}</button>
+        <button v-if="!thisModal.isEventNew.value" type="button" @click="deleteEvent" class="delete-btn">
           {{ $t('deleteBtn') }}
         </button>
       </div>

@@ -7,15 +7,16 @@ import CalendarList from '@/components/CalendarList.vue';
 import EventModal from '@/components/EventModal.vue';
 import CalendarModal from '@/components/CalendarModal.vue';
 
-import { calendarViewValues, useSettings, type CalendarView } from '@/composables/useSettings';
-import { provide, ref, computed, type ComputedRef, useTemplateRef } from 'vue';
+import { computed, type ComputedRef, useTemplateRef } from 'vue';
 import { useRoute } from 'vue-router';
-import { openCalendarModalKey, openEventModalKey } from '@/types/injectionKeys';
-import type { CalendarEvent } from '@/types/core';
-
+import { calendarViewValues, useSettings, type CalendarView } from '@/composables/useSettings';
 import { useKeyboard } from '@/composables/useKeyboard';
-useKeyboard();
+import { useCalendarModal } from '@/composables/useCalendarModal';
+import { useEventModal } from '@/composables/useEventModal';
 
+useKeyboard();
+const calendarModal = useCalendarModal();
+const eventModal = useEventModal();
 const { settings } = useSettings();
 const route = useRoute();
 
@@ -44,24 +45,6 @@ function updateCallDown() {
   viewComponent.value?.updateData();
   calendarsList.value?.updateData();
 }
-
-// --------- Modals/Popups ---------
-
-const showEventModal = ref(false);
-const editingEvent = ref<CalendarEvent | undefined>(undefined);
-const creatingNewEvent = ref<boolean>(false);
-function openEventModal(event?: CalendarEvent, newEvent?: boolean) {
-  if (event) editingEvent.value = event;
-  showEventModal.value = true;
-  creatingNewEvent.value = newEvent!;
-}
-provide(openEventModalKey, openEventModal);
-
-const showCalendarModal = ref(false);
-function openCalendarModal() {
-  showCalendarModal.value = true;
-}
-provide(openCalendarModalKey, openCalendarModal);
 </script>
 
 <template>
@@ -74,15 +57,8 @@ provide(openCalendarModalKey, openCalendarModal);
     <TopBar />
     <component :is="views[activeView][0]" :num-of-days="views[activeView][1]" ref="calendar-view" />
 
-    <EventModal
-      v-if="showEventModal"
-      :event="editingEvent"
-      :creating-new="creatingNewEvent"
-      @close="showEventModal = false"
-      @refresh-data="updateCallDown"
-    />
-
-    <CalendarModal v-if="showCalendarModal" @close="showCalendarModal = false" @refresh-data="updateCallDown" />
+    <EventModal v-if="eventModal.isOpen.value" @refresh-data="updateCallDown" />
+    <CalendarModal v-if="calendarModal.isOpen.value" @refresh-data="updateCallDown" />
   </div>
 </template>
 

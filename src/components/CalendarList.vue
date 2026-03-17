@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import { CalendarCore } from '@/wasm/core-wrapper';
 import { FiTrash, FiPlus } from 'vue-icons-plus/fi';
-import { onMounted, ref, inject } from 'vue';
-import { openCalendarModalKey } from '@/types/injectionKeys';
+import { onMounted, ref } from 'vue';
+import { useCalendarModal } from '@/composables/useCalendarModal';
 
+const calendarModal = useCalendarModal();
 const emit = defineEmits(['refresh-data']);
-
 interface Calendar {
   name: string;
   checked: boolean;
 }
 const calendars = ref<Calendar[]>([]);
-
-const openCalendarModal = inject(openCalendarModalKey);
 
 onMounted(async () => {
   await updateData();
@@ -48,7 +46,7 @@ defineExpose({ updateData });
   <div class="calendars">
     <div class="top-bar">
       <span class="title">{{ $t('calendarsTitle') }}:</span>
-      <button class="create-new" @click="openCalendarModal">
+      <button class="create-new" @click="calendarModal.open">
         <FiPlus />
       </button>
     </div>

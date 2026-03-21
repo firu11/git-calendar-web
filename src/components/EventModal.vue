@@ -1,9 +1,21 @@
 <script setup lang="ts">
-import { ref, reactive, watch, onMounted } from 'vue';
-import { type CalendarEvent } from '@/types/core';
+import { ref, reactive, watch, onMounted, toRaw } from 'vue';
+import { Freq, UpdateStrategy, type CalendarEvent } from '@/types/core';
 import { DateTime } from 'luxon';
 import { CalendarCore } from '@/wasm/core-wrapper';
 import { useEventModal } from '@/composables/useEventModal';
+
+const repeatEndOptions = [
+  { value: 'on', label: 'On' },
+  { value: 'after', label: 'After' },
+];
+const frequencyOptions = [
+  { value: null, label: 'never' },
+  { value: Freq.Day, label: 'daily' },
+  { value: Freq.Week, label: 'weekly' },
+  { value: Freq.Month, label: 'monthly' },
+  { value: Freq.Year, label: 'yearly' },
+];
 
 const emit = defineEmits(['refresh-data']);
 const thisModal = useEventModal();
@@ -17,14 +29,21 @@ const form = reactive({
   toDate: '',
   toTime: '',
   calendar: '',
-  wholeDay: false,
+  entireDay: false,
+
+  repeatFreq: null as Freq | null,
+  repeatEnd: 'after',
+  repeatEndOn: DateTime.now().plus({ week: 1 }).toISODate(),
+  repeatEndAfter: 5,
 });
 
 const calendarNames = ref([] as string[]);
 
+let originalEvent: CalendarEvent | undefined = undefined;
 watch(
   () => thisModal.event,
   (newEvent) => {
+    originalEvent = structuredClone(toRaw(newEvent.value)); // copy
     updateFormFromEvent(newEvent.value);
   },
   { immediate: true }, // fire right onMounted, not wait till first change
@@ -43,11 +62,33 @@ function updateFormFromEvent(event: CalendarEvent | undefined) {
   form.fromTime = event.from.toISOTime({ includeOffset: false, precision: 'minute' }) ?? '';
   form.toTime = event.to.toISOTime({ includeOffset: false, precision: 'minute' }) ?? '';
 
+  if (form.fromTime == '00:00' && form.toTime == '23:59') {
+    form.entireDay = true;
+    form.fromTime = '14:00'; // TODO some defaults
+    form.toTime = '16:00';
+  } else {
+    form.entireDay = false;
+  }
+
+  if (event.repeat) {
+    form.repeatFreq = event.repeat.frequency as Freq;
+
+    if (event.repeat.count && event.repeat.count > 1) {
+      form.repeatEnd = 'After';
+      form.repeatEndAfter = event.repeat.count;
+    } else if (event.repeat.until) {
+      form.repeatEnd = 'On';
+      form.repeatEndOn = event.repeat.until.toISOTime({ includeOffset: false, precision: 'minute' }) ?? '';
+    } else {
+      console.log('Something went wrong with the events repetition. Both Until and Count are undefined or invalid.');
+    }
+  }
+
   form.calendar = event.calendar;
 }
 
 function reconstructEvent(): CalendarEvent {
-  const event = {} as CalendarEvent;
+  const event = originalEvent ?? ({} as CalendarEvent);
 
   event.id = thisModal.event.value?.id;
   event.title = form.title;
@@ -55,26 +96,52 @@ function reconstructEvent(): CalendarEvent {
   event.description = form.description;
   event.calendar = form.calendar;
 
-  if (form.wholeDay) {
-    event.from = DateTime.fromISO(`${form.fromDate}T00:00:00`);
-    event.to = DateTime.fromISO(`${form.toDate}T23:59:00`);
+  if (form.entireDay) {
+    event.from = DateTime.fromISO(`${form.fromDate}T00:00`);
+    event.to = DateTime.fromISO(`${form.toDate}T23:59`);
   } else {
     event.from = DateTime.fromISO(`${form.fromDate}T${form.fromTime}`);
     event.to = DateTime.fromISO(`${form.toDate}T${form.toTime}`);
   }
 
+  if (form.repeatFreq) {
+    event.repeat = {
+      frequency: form.repeatFreq as Freq,
+      interval: 1, // TODO
+      until: form.repeatEnd == 'On' ? DateTime.fromISO(`${form.fromDate}`) : undefined,
+      count: form.repeatEnd == 'After' ? form.repeatEndAfter : -1,
+    };
+  } else {
+    event.repeat = undefined;
+  }
+
   return event;
 }
 
-async function saveEvent() {
+async function saveEvent(e: Event) {
+  e.preventDefault();
+
   const event = reconstructEvent();
-  if (thisModal.isEventNew.value) {
-    const e = await CalendarCore.createEvent(event);
-    console.log('created event:', e);
-  } else {
-    const e = await CalendarCore.updateEvent(event);
-    console.log('updated event:', e);
+
+  let newEvent: CalendarEvent;
+  try {
+    if (thisModal.isEventNew.value) {
+      newEvent = await CalendarCore.createEvent(event);
+      console.log('created event:', newEvent);
+    } else if (!event.repeat && !originalEvent?.repeat) {
+      console.log(event.repeat, originalEvent?.repeat, event.masterId);
+      newEvent = await CalendarCore.updateEvent(event);
+      console.log('updated event:', newEvent);
+    } else {
+      // TODO popup with update strategy options
+      newEvent = await CalendarCore.updateEventWithStrategy(event, UpdateStrategy.All);
+      console.log('updated event with strategy:', newEvent);
+    }
+  } catch (err) {
+    alert(err);
+    return;
   }
+
   emit('refresh-data');
   thisModal.close();
 }
@@ -103,19 +170,49 @@ onMounted(async () => {
         <span>{{ $t('event.from') }}:</span>
         <div class="datetime">
           <input type="date" name="from-date" v-model="form.fromDate" />
-          <input type="time" name="from-time" v-model="form.fromTime" v-if="!form.wholeDay" />
+          <input type="time" name="from-time" v-model="form.fromTime" v-if="!form.entireDay" />
         </div>
 
         <span>{{ $t('event.to') }}:</span>
         <div class="datetime">
           <input type="date" name="to-date" v-model="form.toDate" />
-          <input type="time" name="to-time" v-model="form.toTime" v-if="!form.wholeDay" />
+          <input type="time" name="to-time" v-model="form.toTime" v-if="!form.entireDay" />
         </div>
       </div>
 
       <label>
-        {{ $t('event.wholeDay') }}
-        <input type="checkbox" v-model="form.wholeDay" />
+        {{ $t('event.entireDay') }}
+        <input type="checkbox" v-model="form.entireDay" />
+      </label>
+
+      <label>
+        {{ $t('event.repeat.repeat') }}:
+        <select name="repeat" v-model="form.repeatFreq">
+          <option v-for="freq in frequencyOptions" :value="freq.value" :key="freq.label">
+            {{ $t(`event.repeat.${freq.label}`) }}
+          </option>
+        </select>
+      </label>
+
+      <label v-if="form.repeatFreq">
+        {{ $t('event.repeat.end') }}:
+        <select name="end" v-model="form.repeatEnd">
+          <option v-for="end in repeatEndOptions" :value="end.value" :key="end.label">
+            {{ $t(`event.repeat.end${end.label}`) }}
+          </option>
+        </select>
+
+        <input v-if="form.repeatEnd == 'on'" type="date" name="end-on" v-model="form.repeatEndOn" />
+        <input v-if="form.repeatEnd == 'after'" type="number" name="end-after" v-model="form.repeatEndAfter" />
+      </label>
+
+      <label>
+        {{ $t('event.calendar') }}:
+        <select name="calendar" v-model="form.calendar">
+          <option v-for="calendarName in calendarNames" :value="calendarName" :key="calendarName">
+            {{ calendarName }}
+          </option>
+        </select>
       </label>
 
       <input
@@ -126,14 +223,8 @@ onMounted(async () => {
         v-model="form.location"
       />
 
-      <select name="calendar" id="" v-model="form.calendar">
-        <option v-for="calendarName in calendarNames" :value="calendarName" :key="calendarName">
-          {{ calendarName }}
-        </option>
-      </select>
-
       <!--
-      TODO tags and calendar select
+      TODO tags
       <div>
         <label v-for="tagName in exampleTags" :key="tagName">
           <input type="checkbox" name="idk" :value="tagName" v-model="selectedTags" />
@@ -145,7 +236,7 @@ onMounted(async () => {
       <textarea name="description" rows="3" :placeholder="$t('event.description')" v-model="form.description" />
 
       <div class="bottom-btns">
-        <button type="button" @click="saveEvent">{{ $t('saveBtn') }}</button>
+        <button type="submit" @click="saveEvent">{{ $t('saveBtn') }}</button>
         <button type="button" @click="thisModal.close">{{ $t('closeBtn') }}</button>
         <button v-if="!thisModal.isEventNew.value" type="button" @click="deleteEvent" class="delete-btn">
           {{ $t('deleteBtn') }}
@@ -156,6 +247,28 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+label:has(select[name='end']) {
+  margin-left: 4.3rem;
+
+  input[name='end-after'] {
+    width: 5rem;
+  }
+
+  input[name='end-on'] {
+    width: 10rem;
+  }
+}
+
+label:has(select) {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+
+  select {
+    width: 100%;
+  }
+}
+
 .dates {
   display: grid;
   grid-template-columns: auto 1fr;

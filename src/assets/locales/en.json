@@ -19,7 +19,19 @@
     "location": "Location",
     "from": "From",
     "to": "Till",
-    "wholeDay": "Whole day"
+    "entireDay": "Entire day",
+    "calendar": "Calendar",
+    "repeat": {
+      "repeat": "Repeat",
+      "end": "End",
+      "endOn": "On",
+      "endAfter": "After",
+      "never": "Never",
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    }
   },
   "calendar": {
     "name": "Name"

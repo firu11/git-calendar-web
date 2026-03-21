@@ -19,7 +19,19 @@
     "location": "Lokace",
     "from": "Od",
     "to": "Do",
-    "wholeDay": "Celý den"
+    "entireDay": "Celý den",
+    "calendar": "Kalendář",
+    "repeat": {
+      "repeat": "Opakování",
+      "end": "Konec",
+      "endOn": "Datum",
+      "endAfter": "Opakování",
+      "never": "Nikdy",
+      "daily": "Denně",
+      "weekly": "Týdně",
+      "monthly": "Měsíčně",
+      "yearly": "Ročně"
+    }
   },
   "calendar": {
     "name": "Jméno"

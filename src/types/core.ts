@@ -9,7 +9,16 @@ export interface CalendarEvent {
   to: DateTime;
   calendar: string;
   tag: string;
-  // TODO repeat
+  repeat?: Repetition;
+  masterId?: string;
+}
+
+export interface Repetition {
+  frequency: Freq;
+  interval: number;
+  until?: DateTime;
+  count?: number;
+  //exceptions: string[]
 }
 
 // A interface showing all the methods of CalendarCore.
@@ -26,10 +35,25 @@ export interface CalendarApi {
 
   createEvent(event: CalendarEvent): CalendarEvent;
   updateEvent(event: CalendarEvent): CalendarEvent;
+  updateEventWithStrategy(event: CalendarEvent, strategy: UpdateStrategy): CalendarEvent;
   removeEvent(event: CalendarEvent): void;
 
   getEvent(id: string): CalendarEvent;
   getEvents(from: DateTime, to: DateTime): CalendarEvent[];
 
   setCorsProxy(url: string): void;
+}
+
+export enum Freq {
+  Invalid = 0,
+  Day,
+  Week,
+  Month,
+  Year,
+}
+
+export enum UpdateStrategy {
+  Current = 0,
+  Following,
+  All,
 }

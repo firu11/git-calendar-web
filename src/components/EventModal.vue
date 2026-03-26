@@ -123,7 +123,7 @@ function dateTimeToIsoDateAndTime(time: DateTime): [string, string] {
 }
 
 async function saveEvent(e: Event) {
-  e.preventDefault();
+  e.preventDefault(); // don't refresh page with button type submit
 
   const event = reconstructEvent();
 
@@ -132,7 +132,7 @@ async function saveEvent(e: Event) {
     if (thisModal.isEventNew.value) {
       newEvent = await CalendarCore.createEvent(event);
       console.log('created event:', newEvent);
-    } else if (!event.repeat && !originalEvent?.repeat) {
+    } else if (!originalEvent?.repeat) {
       newEvent = await CalendarCore.updateEvent(event);
       console.log('updated event:', newEvent);
     } else {
@@ -151,7 +151,21 @@ async function saveEvent(e: Event) {
 
 async function deleteEvent() {
   const event = reconstructEvent();
-  await CalendarCore.removeEvent(event);
+
+  try {
+    if (!event.repeat) {
+      await CalendarCore.removeEvent(event);
+      console.log('deleted repeating event:', event);
+    } else {
+      // TODO popup with update strategy options
+      await CalendarCore.removeRepeatingEvent(event, UpdateStrategy.Current);
+      console.log('deleted repeating event:', event);
+    }
+  } catch (err) {
+    alert(err);
+    return;
+  }
+
   emit('refresh-data');
   thisModal.close();
 }

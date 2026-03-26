@@ -36,7 +36,9 @@ export interface CalendarApi {
   createEvent(event: CalendarEvent): CalendarEvent;
   updateEvent(event: CalendarEvent): CalendarEvent;
   updateRepeatingEvent(oldEvent: CalendarEvent, newEvent: CalendarEvent, strategy: UpdateStrategy): CalendarEvent;
+
   removeEvent(event: CalendarEvent): void;
+  removeRepeatingEvent(event: CalendarEvent, strategy: UpdateStrategy): void;
 
   getEvent(id: string): CalendarEvent;
   getEvents(from: DateTime, to: DateTime): CalendarEvent[];

@@ -25,12 +25,20 @@ export function moveView(back: boolean, router: Router) {
   const currentDatetime = getCurrentViewDatetime(router.currentRoute.value.params);
   const sign = back ? -1 : 1;
 
+  let newDate: DateTime;
   switch (router.currentRoute.value.params.view) {
     case 'month':
-    case 'week':
-      const newDate = currentDatetime.plus({ days: 7 * sign });
+      newDate = currentDatetime.plus({ month: 1 * sign });
       router.replace({ name: 'calendar', params: { year: newDate.year, month: newDate.month, day: newDate.day } });
+      break;
+    case 'week':
+      newDate = currentDatetime.plus({ days: 7 * sign });
+      router.replace({ name: 'calendar', params: { year: newDate.year, month: newDate.month, day: newDate.day } });
+      break;
     case '4days':
+      newDate = currentDatetime.plus({ days: 4 * sign });
+      router.replace({ name: 'calendar', params: { year: newDate.year, month: newDate.month, day: newDate.day } });
+      break;
   }
 }
 

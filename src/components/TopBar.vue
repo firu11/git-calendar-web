@@ -10,7 +10,7 @@ const emit = defineEmits(['sidebar-toggle']);
 const router = useRouter();
 
 const views = ['4days', 'Week', 'Month'];
-const view = ref(views[1]);
+const view = ref(capitalized(router.currentRoute.value.params.view.toString()));
 
 function changeView(viewName: string) {
   view.value = viewName;
@@ -30,6 +30,13 @@ function jumpToToday() {
   router.push({ name: 'calendar', params: { year: today.year, month: today.month, day: today.day } });
 }
 
+function capitalized(str: string): string {
+  let result: string;
+  result = str.charAt(0).toUpperCase();
+  result += str.slice(1) || '';
+  return result;
+}
+
 watch(view, changeView);
 </script>
 
@@ -40,7 +47,7 @@ watch(view, changeView);
     </button>
 
     <!-- TODO: remove disabled -->
-    <MultiToggle v-model="view" :options="views" :disabled="['4days', 'Month']" name="view-selector" />
+    <MultiToggle v-model="view" :options="views" :disabled="['Month']" name="view-selector" />
 
     <button id="today-btn" @click="jumpToToday">
       {{ $t('todayBtn') }}

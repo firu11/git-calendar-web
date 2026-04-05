@@ -36,7 +36,7 @@ export function hydrateDates<T>(data: unknown): T {
     if (dateTimeFieldNames.includes(key) && typeof value === 'string') {
       const dt = DateTime.fromISO(value, {
         setZone: true, // respect & keep the timezone offset from the string
-      });
+      }).toLocal();
 
       if (!dt.isValid) {
         console.warn(`Bad ISO in ${key}: ${value} -> ${dt.invalidExplanation}`);

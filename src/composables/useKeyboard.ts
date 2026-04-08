@@ -7,7 +7,7 @@ import { DateTime } from 'luxon';
 export function useKeyboard() {
   function inputNeededElsewhere(): boolean {
     return document.activeElement!.matches(
-      'input, textarea, select, [contenteditable], button, [role="textbox"], [role="combobox"]',
+      'input:not([type="radio"]), textarea, select, [contenteditable], button, [role="textbox"], [role="combobox"]',
     );
   }
 

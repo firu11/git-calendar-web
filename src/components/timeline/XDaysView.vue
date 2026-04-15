@@ -47,7 +47,7 @@ const hoursOnGrid = computed(() => {
     const current = (start + i) % 24;
 
     // resolve formats manually ig
-    if (settings.value.timeFormat === 'h11') {
+    if (settings.value.timeFormat === 'h12') {
       const h = current % 12 || 12;
       const period = current < 12 ? 'AM' : 'PM';
       result.push(`${h} ${period}`);

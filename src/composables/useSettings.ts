@@ -11,7 +11,7 @@ export const calendarViewValues = ['4days', 'week', 'month'] as const;
 export type CalendarView = (typeof calendarViewValues)[number];
 
 type Theme = 'auto' | 'light' | 'dark';
-type HourCycle = 'h11' | 'h23';
+type HourCycle = 'h12' | 'h23';
 type Lang = (typeof LANGUAGES)[number]['code'];
 
 type UserSettings = {
@@ -32,7 +32,7 @@ const settings = useStorage<UserSettings>(
   {
     theme: 'auto',
     language: 'en',
-    timeFormat: 'h23',
+    timeFormat: getBrowserHourCycle(),
     weekStart: 1, // monday
     defaultView: 'week',
     dayViewStartHour: 6,
@@ -56,6 +56,17 @@ LuxonSettings.defaultLocale = settings.value.language;
 function getSystemThemePreference() {
   const name = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   return name!;
+}
+
+function getBrowserHourCycle(): HourCycle {
+  const formatter = new Intl.DateTimeFormat(undefined, {
+    hour: 'numeric',
+  });
+  const resolved = formatter.resolvedOptions().hourCycle;
+  if (resolved === 'h11' || resolved === 'h12') {
+    return 'h12';
+  }
+  return 'h23';
 }
 
 // auto html tag update

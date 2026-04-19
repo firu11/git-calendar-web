@@ -68,7 +68,13 @@ async function setCorsProxy() {
 
     <label>
       CORS Proxy:
-      <input type="text" name="cors-proxy" @change="setCorsProxy" v-model="settings.corsProxyURL" />
+      <input
+        type="text"
+        name="cors-proxy"
+        @change="setCorsProxy"
+        v-model="settings.corsProxyURL"
+        placeholder="https://..."
+      />
     </label>
   </form>
 </template>

@@ -1,5 +1,6 @@
 import { ref, shallowRef, readonly, computed } from 'vue';
 import type { CalendarEvent } from '@/types/core';
+import { DateTime } from 'luxon';
 
 const isOpen = ref(false);
 const editingEvent = shallowRef<CalendarEvent | undefined>(undefined);
@@ -14,7 +15,13 @@ export function useEventModal() {
       if (event) {
         editingEvent.value = event;
       } else {
-        editingEvent.value = undefined;
+        editingEvent.value = {
+          title: '',
+          from: DateTime.now(),
+          to: DateTime.now().plus({ hour: 2 }),
+          calendar: 'main',
+          tag: '',
+        };
       }
 
       isOpen.value = true;

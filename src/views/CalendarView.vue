@@ -7,19 +7,20 @@ import CalendarList from '@/components/CalendarList.vue';
 import EventModal from '@/components/EventModal.vue';
 import CalendarModal from '@/components/CalendarModal.vue';
 
-import { computed, type ComputedRef, ref, useTemplateRef } from 'vue';
+import { computed, type ComputedRef, useTemplateRef } from 'vue';
 import { useRoute } from 'vue-router';
 import { calendarViewValues, useSettings, type CalendarView } from '@/composables/useSettings';
 import { useKeyboard } from '@/composables/useKeyboard';
 import { useCalendarModal } from '@/composables/useCalendarModal';
 import { useEventModal } from '@/composables/useEventModal';
+import { useSidebar } from '@/composables/useSidebar';
 
 useKeyboard();
 const calendarModal = useCalendarModal();
 const eventModal = useEventModal();
 const { settings } = useSettings();
 const route = useRoute();
-const sidebarOpen = ref(window.innerWidth >= 768); // opened on load only when desktop width
+const sidebar = useSidebar();
 
 const activeView: ComputedRef<CalendarView> = computed(() => {
   const param = route.params.view;
@@ -50,12 +51,12 @@ function updateCallDown() {
 
 <template>
   <div id="calendar-view">
-    <SideBar :hidden="!sidebarOpen">
+    <SideBar :hidden="!sidebar.isOpen.value">
       <MonthSideMap />
       <CalendarList ref="calendars-list" @refresh-data="updateCallDown" />
     </SideBar>
 
-    <TopBar @sidebar-toggle="sidebarOpen = !sidebarOpen" />
+    <TopBar />
     <component :is="views[activeView][0]" :num-of-days="views[activeView][1]" ref="calendar-view" />
 
     <EventModal v-if="eventModal.isOpen.value" @refresh-data="updateCallDown" />

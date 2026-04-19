@@ -2,12 +2,18 @@
 import { ref, watch } from 'vue';
 import { getCurrentViewDatetime, getStartOfWeek, moveView } from '@/utils';
 import { DateTime } from 'luxon';
-import { FiChevronLeft, FiChevronRight, FiSidebar } from 'vue-icons-plus/fi';
+import { FiChevronLeft, FiChevronRight } from 'vue-icons-plus/fi';
 import { useRouter } from 'vue-router';
+import { useSidebar } from '@/composables/useSidebar';
 import MultiToggle from '@/components/MultiToggle.vue';
+import SidebarCloseBtn from '@/components/SidebarCloseBtn.vue';
+import NewEventBtn from '@/components/NewEventBtn.vue';
+import { useMobile } from '@/composables/useMobile';
 
-const emit = defineEmits(['sidebar-toggle']);
 const router = useRouter();
+const sidebar = useSidebar();
+
+const isMobile = useMobile();
 
 const views = ['4days', 'Week', 'Month'];
 const view = ref(capitalized(router.currentRoute.value.params.view.toString()));
@@ -55,9 +61,8 @@ function capitalized(str: string): string {
 
 <template>
   <header>
-    <button id="sidebar-toggle" @click="emit('sidebar-toggle')">
-      <FiSidebar />
-    </button>
+    <SidebarCloseBtn v-if="!sidebar.isOpen.value" />
+    <NewEventBtn v-if="!sidebar.isOpen.value" :large="!isMobile" />
 
     <!-- TODO: remove disabled -->
     <MultiToggle v-model="view" :options="views" :disabled="['Month']" name="view-selector" />
@@ -78,13 +83,13 @@ header {
   display: flex;
   align-items: center;
   justify-content: end;
-  gap: 1rem;
+  gap: 0.5rem;
 
-  padding: 0.5rem 0.7rem;
+  padding: 0.5rem;
   grid-area: topbar;
 }
 
-#sidebar-toggle {
+.new-event-btn {
   margin-right: auto;
 }
 

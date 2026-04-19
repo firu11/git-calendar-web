@@ -130,7 +130,9 @@ async function saveEvent(e: Event) {
   let newEvent: CalendarEvent;
   try {
     if (thisModal.isEventNew.value) {
+      console.time('Time to create event');
       newEvent = await CalendarCore.createEvent(event);
+      console.timeEnd('Time to create event');
       console.log('created event:', newEvent);
     } else if (!originalEvent?.repeat) {
       newEvent = await CalendarCore.updateEvent(event);
@@ -154,7 +156,9 @@ async function deleteEvent() {
 
   try {
     if (!event.repeat) {
+      console.time('Time to delete event');
       await CalendarCore.removeEvent(event);
+      console.timeEnd('Time to delete event');
       console.log('deleted repeating event:', event);
     } else {
       // TODO popup with update strategy options

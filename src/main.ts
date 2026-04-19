@@ -2,21 +2,8 @@ import { createApp } from 'vue';
 import App from '@/App.vue';
 import router from '@/router.ts';
 import '@/assets/styles.css';
-import { CalendarCore } from '@/wasm/core-wrapper.ts';
 import '@/composables/useSettings.ts'; // init settings
 import { useTranslation } from '@/composables/useTranslation';
-import { useSettings } from '@/composables/useSettings.ts';
-
-const { settings } = useSettings();
-
-try {
-  await CalendarCore.setCorsProxy(settings.value.corsProxyURL);
-} catch {
-  // TODO
-}
-
-await CalendarCore.createCalendar('main', '');
-await CalendarCore.loadCalendars();
 
 const { i18n } = useTranslation();
 

@@ -53,5 +53,13 @@
   "deleteBtn": "Smazat",
   "todayBtn": "Dnes",
   "calendarsTitle": "Kalendáře",
-  "optionalText": "nepovinné"
+  "optionalText": "nepovinné",
+  "loading": {
+    "loading": "Načítání...",
+    "storage": "Příprava uložiště...",
+    "fetchingWasm": "Stahování WASM:",
+    "compiling": "Kompilace modulu...",
+    "starting": "Startování...",
+    "done": "Hotovo!"
+  }
 }

@@ -1,80 +1,183 @@
 /// <reference lib="webworker" />
 import '@/wasm/wasm_exec.js';
 
+// Disclamer: I wibe-coded this shit. Who the hell would enjoy writing something like this.
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Types & Globals
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface GoRuntime {
+  importObject: WebAssembly.Imports;
+  run(instance: WebAssembly.Instance): void;
+}
+
+interface CalendarCoreApi {
+  [method: string]: (...args: unknown[]) => unknown | Promise<unknown>;
+}
+
+// Extend the worker scope to banish `(self as any)` forever
+declare global {
+  interface DedicatedWorkerGlobalScope {
+    Go: new () => GoRuntime;
+    opfsRootHandle: FileSystemDirectoryHandle;
+    onWasmReady: () => void;
+    CalendarCore?: CalendarCoreApi;
+  }
+}
+
 declare const self: DedicatedWorkerGlobalScope;
 
-let go: any;
+type WorkerOutbound =
+  | { type: 'progress'; percentage: number; textId: string; other: string }
+  | { type: 'result'; id: number; result: unknown }
+  | { type: 'error'; id: number; error: string };
+
+interface RpcRequest {
+  id: number;
+  method: string;
+  args: unknown[];
+}
+
+const MB = 1_048_576;
 let wasmReadyPromise: Promise<void> | null = null;
-let opfsRootHandle: FileSystemDirectoryHandle | null = null;
 
-async function initWasm() {
-  // if we already started initializing, return the existing promise
-  if (wasmReadyPromise) return wasmReadyPromise;
+// ─────────────────────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────────────────────
 
-  // init go wasm
-  wasmReadyPromise = (async () => {
-    await initOPFS();
+function post(msg: WorkerOutbound) {
+  self.postMessage(msg);
+}
+function progress(percentage: number, text_id: string, other: string = '') {
+  post({ type: 'progress', percentage, textId: text_id, other });
+}
 
-    go = new (self as any).Go();
+// ─────────────────────────────────────────────────────────────────────────────
+// WASM Fetching & OPFS
+// ─────────────────────────────────────────────────────────────────────────────
 
-    // create a promise that resolves when Go calls 'onWasmReady'
-    const onReady = new Promise<void>((resolve) => {
-      (self as any).onWasmReady = () => {
-        console.log('Go Wasm is fully initialized and callbacks registered.');
-        resolve();
-      };
+async function fetchWasm(url: string): Promise<ArrayBuffer> {
+  const response = await fetch(url);
+  if (!response.ok || !response.body) {
+    throw new Error(`WASM fetch failed: HTTP ${response.status} or missing body`);
+  }
+
+  const contentLength = response.headers.get('Content-Length');
+  const total = contentLength ? parseInt(contentLength, 10) : 0;
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    chunks.push(value);
+    received += value.byteLength;
+
+    const pct = total ? 5 + Math.round((received / total) * 85) : 50;
+    const sizeMsg = total
+      ? `${(received / MB).toFixed(1)} / ${(total / MB).toFixed(1)} MB`
+      : `${(received / MB).toFixed(1)} MB`;
+
+    progress(pct, `fetchingWasm`, sizeMsg);
+  }
+
+  // Merge chunks
+  const merged = new Uint8Array(received);
+  let offset = 0;
+  for (const chunk of chunks) {
+    merged.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  return merged.buffer;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Initialization
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function setupWasm(): Promise<void> {
+  progress(0, 'storage');
+  if (!navigator.storage?.getDirectory) {
+    throw new Error('OPFS is not available in this context.');
+  }
+  self.opfsRootHandle = await navigator.storage.getDirectory();
+
+  const go = new self.Go();
+  const onReady = new Promise<void>((resolve) => {
+    self.onWasmReady = () => {
+      console.log('Go Wasm initialized.');
+      resolve();
+    };
+  });
+
+  progress(5, 'fetchingWasm');
+  const wasmUrl = new URL('@/assets/core.wasm', import.meta.url).href;
+  const buffer = await fetchWasm(wasmUrl);
+
+  progress(90, 'compiling');
+  const { instance } = await WebAssembly.instantiate(buffer, go.importObject);
+
+  progress(95, 'starting');
+  go.run(instance);
+
+  await onReady;
+  progress(100, 'done');
+}
+
+function initWasm(): Promise<void> {
+  if (!wasmReadyPromise) {
+    wasmReadyPromise = setupWasm().catch((err) => {
+      wasmReadyPromise = null; // Reset so callers can retry
+      throw err;
     });
-
-    const wasmUrl = new URL('@/assets/core.wasm', import.meta.url).href;
-    const response = await fetch(wasmUrl);
-
-    if (!response.ok) {
-      throw new Error(`Failed to load WASM: ${response.status}`);
-    }
-
-    const buffer = await response.arrayBuffer();
-    const { instance } = await WebAssembly.instantiate(buffer, go.importObject);
-
-    // start Go
-    go.run(instance);
-    await onReady;
-  })();
-
+  }
   return wasmReadyPromise;
 }
 
-async function initOPFS() {
-  if (!navigator.storage || typeof navigator.storage.getDirectory !== 'function') {
-    throw new Error('OPFS not available. navigator.storage: ' + navigator.storage);
-  }
+// ─────────────────────────────────────────────────────────────────────────────
+// RPC Dispatch
+// ─────────────────────────────────────────────────────────────────────────────
 
-  opfsRootHandle = await navigator.storage.getDirectory();
-  // expose for Go
-  (self as any).opfsRootHandle = opfsRootHandle;
-}
-
-self.onmessage = async (e: MessageEvent) => {
-  const { id, method, args } = e.data;
+async function dispatch({ id, method, args }: RpcRequest): Promise<void> {
   try {
-    // init if not already
     await initWasm();
 
-    // convert args to JSON strings if they are objects
-    const jsonArgs = args.map((a: any) => (typeof a === 'object' ? JSON.stringify(a) : a));
-
-    const wasmApi = (self as any).CalendarCore;
-    if (!wasmApi || !wasmApi[method]) {
-      throw new Error(`Method ${method} not found on CalendarCore`);
+    const api = self.CalendarCore;
+    if (!api || typeof api[method] !== 'function') {
+      throw new Error(`Method "${method}" not found on CalendarCore`);
     }
 
-    // call the Go WASM method
-    let rawResult = await wasmApi[method](...jsonArgs);
+    // Serialize object args to JSON for Go
+    const serializedArgs = args.map((arg) => (typeof arg === 'object' && arg !== null ? JSON.stringify(arg) : arg));
 
-    // unmarshall
-    let processedResult = typeof rawResult === 'string' && rawResult !== '' ? JSON.parse(rawResult) : rawResult;
+    const raw = await api[method](...serializedArgs);
 
-    self.postMessage({ id, result: processedResult ?? null });
-  } catch (err: any) {
-    self.postMessage({ id, error: err.message });
+    // Attempt to deserialize result if it's a JSON string
+    let result = raw ?? null;
+    if (typeof raw === 'string' && raw.length > 0) {
+      try {
+        result = JSON.parse(raw);
+      } catch {
+        /* keep as plain string */
+      }
+    }
+
+    post({ type: 'result', id, result });
+  } catch (err: unknown) {
+    post({ type: 'error', id, error: err instanceof Error ? err.message : String(err) });
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Entry point
+// ─────────────────────────────────────────────────────────────────────────────
+
+void initWasm();
+
+self.onmessage = (e: MessageEvent<RpcRequest>) => {
+  void dispatch(e.data);
 };

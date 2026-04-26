@@ -97,7 +97,7 @@ export function useDraggingEvent(timelineRef: Ref<HTMLElement | null>, date: Ref
 
     if (e.pointerType === 'touch') {
       e.preventDefault();
-      holdTimeout = window.setTimeout(() => startDragging(e), 100);
+      holdTimeout = window.setTimeout(() => startDragging(e), 400);
       window.addEventListener('pointerup', cancelHold);
       window.addEventListener('pointermove', cancelHold);
     } else {

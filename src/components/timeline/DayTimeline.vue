@@ -62,7 +62,10 @@ const nonoverlappingGroups = computed(() => {
 const timelineRef = useTemplateRef<HTMLElement>('timeline-ref');
 const dateRef = computed(() => props.date);
 
-const { drag, placeholderHeight, placeholderSubtitle, dragStart } = useDraggingEvent(timelineRef, dateRef);
+const { drag, placeholderTop, placeholderHeight, placeholderSubtitle, dragStart } = useDraggingEvent(
+  timelineRef,
+  dateRef,
+);
 </script>
 
 <template>
@@ -71,7 +74,7 @@ const { drag, placeholderHeight, placeholderSubtitle, dragStart } = useDraggingE
       <!-- placeholder event for dragging -->
       <BaseEvent
         v-show="drag.active"
-        :top-style="`${drag.startY}px`"
+        :top-style="placeholderTop"
         :height-style="placeholderHeight"
         :title="$t('event.new')"
         :subtitle="placeholderSubtitle"

@@ -12,7 +12,7 @@ export function useDraggingEvent(timelineRef: Ref<HTMLElement | null>, date: Ref
   const { settings } = useSettings();
   const eventModal = useEventModal();
 
-  const drag = ref({ active: false, startY: 0 });
+  const drag = ref({ active: false, anchorY: 0 });
   let holdTimeout: number | null = null;
 
   const snapToGridHeight = computed(() => {
@@ -20,13 +20,23 @@ export function useDraggingEvent(timelineRef: Ref<HTMLElement | null>, date: Ref
     return timelineRef.value.clientHeight / numberOfHours() / (60 / settings.value.dragPrecisionMinutes);
   });
 
-  const snappedHeight = computed(() => {
-    if (!timelineRef.value) return 0;
-    let rawHeight = y.value - timelineRef.value.getBoundingClientRect().y - drag.value.startY;
-    rawHeight = Math.max(snapToGridHeight.value, rawHeight);
-    return Math.round(rawHeight / snapToGridHeight.value) * snapToGridHeight.value;
+  // mouse Y relative to the top of the timeline, snapped to the grid
+  const snappedMouseY = computed(() => {
+    if (!timelineRef.value || snapToGridHeight.value === 0) return 0;
+    const relY = Math.max(0, y.value - timelineRef.value.getBoundingClientRect().y);
+    return Math.round(relY / snapToGridHeight.value) * snapToGridHeight.value;
   });
 
+  // the top of the placeholder is whichever is higher: anchor or current mouse
+  const topY = computed(() => Math.min(drag.value.anchorY, snappedMouseY.value));
+
+  // height spans from top to bottom, with a minimum of one grid slot
+  const snappedHeight = computed(() => {
+    const bottom = Math.max(drag.value.anchorY, snappedMouseY.value);
+    return Math.max(snapToGridHeight.value, bottom - topY.value);
+  });
+
+  const placeholderTop = computed(() => `${topY.value}px`);
   const placeholderHeight = computed(() => `${snappedHeight.value}px`);
 
   const placeholderSubtitle = computed(() => {
@@ -35,15 +45,14 @@ export function useDraggingEvent(timelineRef: Ref<HTMLElement | null>, date: Ref
   });
 
   function getEventTimes(): [DateTime, DateTime] {
-    if (!timelineRef.value) return [date.value, date.value];
+    if (!timelineRef.value || snapToGridHeight.value === 0) return [date.value, date.value];
 
     // number of 30min slots from top
-    const startSlots = Math.round(drag.value.startY / snapToGridHeight.value);
+    const startSlots = Math.round(topY.value / snapToGridHeight.value);
     const durationSlots = Math.round(snappedHeight.value / snapToGridHeight.value);
-    const endSlots = startSlots + durationSlots;
 
     const startTotalMinutes = startSlots * settings.value.dragPrecisionMinutes;
-    const endTotalMinutes = endSlots * settings.value.dragPrecisionMinutes;
+    const endTotalMinutes = (startSlots + durationSlots) * settings.value.dragPrecisionMinutes;
 
     const startTime = date.value
       .set({ hour: settings.value.dayViewStartHour, minute: 0 })
@@ -58,13 +67,10 @@ export function useDraggingEvent(timelineRef: Ref<HTMLElement | null>, date: Ref
 
   function startDragging(_: PointerEvent) {
     drag.value.active = true;
-    const gridHeight = timelineRef.value!.clientHeight / numberOfHours() / 2;
 
-    let startY = y.value - timelineRef.value!.getBoundingClientRect().y;
-    startY = Math.max(0, startY);
-    startY = Math.floor(startY / gridHeight) * gridHeight;
-
-    drag.value.startY = startY;
+    // snap the anchor to the grid on press
+    const relY = Math.max(0, y.value - timelineRef.value!.getBoundingClientRect().y);
+    drag.value.anchorY = Math.floor(relY / snapToGridHeight.value) * snapToGridHeight.value;
 
     window.addEventListener('pointerup', dragStop); // listen for stop
   }
@@ -113,6 +119,7 @@ export function useDraggingEvent(timelineRef: Ref<HTMLElement | null>, date: Ref
 
   return {
     drag,
+    placeholderTop,
     placeholderHeight,
     placeholderSubtitle,
     dragStart,

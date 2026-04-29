@@ -177,13 +177,18 @@ async function deleteEvent() {
 }
 
 async function updateWithStrategy(strategy: UpdateStrategy) {
-  switch (strategyModal.getAction()) {
-    case 'delete':
-      await saveRepeatingEvent(strategy);
-      break;
-    case 'update':
-      await deleteRepeatingEvent(strategy);
-      break;
+  try {
+    switch (strategyModal.getAction()) {
+      case 'delete':
+        await deleteRepeatingEvent(strategy);
+        break;
+      case 'update':
+        await saveRepeatingEvent(strategy);
+        break;
+    }
+  } catch (err) {
+    alert(err);
+    return;
   }
 
   emit('refresh-data');

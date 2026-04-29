@@ -11,12 +11,14 @@ const props = defineProps({
   },
 });
 </script>
+
 <template>
   <button class="new-event-btn" :class="{ large: large }" @click="eventModal.open(undefined)">
     <FiPlusCircle />
-    <span v-if="large">New event</span>
+    <span v-if="large">{{ $t('newEventBtn') }}</span>
   </button>
 </template>
+
 <style scoped>
 .new-event-btn {
   display: flex;

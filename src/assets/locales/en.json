@@ -53,6 +53,7 @@
   "cancelBtn": "Cancel",
   "deleteBtn": "Delete",
   "todayBtn": "Today",
+  "newEventBtn": "New event",
   "calendarsTitle": "Calendars",
   "optionalText": "optional",
   "loading": {

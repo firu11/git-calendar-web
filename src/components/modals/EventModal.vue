@@ -345,4 +345,10 @@ label:has(select) {
     background-color: var(--btn-red-bg-color-hover);
   }
 }
+
+@media (max-width: 450px) {
+  label:has(select[name='end']) {
+    margin-left: 1.5rem;
+  }
+}
 </style>

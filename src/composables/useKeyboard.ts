@@ -45,14 +45,14 @@ export function useKeyboard() {
       router.replace({ params: { view: 'month' } });
     });
 
-    // move view back
+    // < -> move view back
     onKeyStroke('ArrowLeft', (e) => {
       if (inputNeededElsewhere()) return;
       e.preventDefault();
       moveView(true, router);
     });
 
-    // move view forward
+    // > -> move view forward
     onKeyStroke('ArrowRight', (e) => {
       if (inputNeededElsewhere()) return;
       e.preventDefault();

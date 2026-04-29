@@ -20,7 +20,6 @@ interface CalendarCoreApi {
 declare global {
   interface DedicatedWorkerGlobalScope {
     Go: new () => GoRuntime;
-    opfsRootHandle: FileSystemDirectoryHandle;
     onWasmReady: () => void;
     CalendarCore?: CalendarCoreApi;
   }
@@ -54,7 +53,7 @@ function progress(percentage: number, text_id: string, other: string = '') {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// WASM Fetching & OPFS
+// WASM Fetching
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function fetchWasm(url: string): Promise<ArrayBuffer> {
@@ -102,11 +101,7 @@ async function fetchWasm(url: string): Promise<ArrayBuffer> {
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function setupWasm(): Promise<void> {
-  progress(0, 'storage');
-  if (!navigator.storage?.getDirectory) {
-    throw new Error('OPFS is not available in this context.');
-  }
-  self.opfsRootHandle = await navigator.storage.getDirectory();
+  progress(0, 'fetchingWasm');
 
   const go = new self.Go();
   const onReady = new Promise<void>((resolve) => {
@@ -116,7 +111,6 @@ async function setupWasm(): Promise<void> {
     };
   });
 
-  progress(5, 'fetchingWasm');
   const wasmUrl = new URL('@/assets/core.wasm', import.meta.url).href;
   const buffer = await fetchWasm(wasmUrl);
 

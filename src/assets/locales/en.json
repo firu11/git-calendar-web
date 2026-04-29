@@ -58,7 +58,6 @@
   "optionalText": "optional",
   "loading": {
     "loading": "Loading...",
-    "storage": "Initializing storage...",
     "fetchingWasm": "Fetching WASM:",
     "compiling": "Compiling module...",
     "starting": "Starting runtime...",

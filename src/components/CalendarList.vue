@@ -25,11 +25,14 @@ function checkboxName(calName: string): string {
 }
 
 async function updateData() {
-  let calendarNames = await CalendarCore.listCalendars();
+  const calendarNames = await CalendarCore.listCalendars();
 
   calendars.value = [];
-  for (const name of calendarNames) {
-    calendars.value.push({ name: name, checked: true });
+
+  if (calendarNames) {
+    for (const name of calendarNames) {
+      calendars.value.push({ name: name, checked: true });
+    }
   }
 }
 

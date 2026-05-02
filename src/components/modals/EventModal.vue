@@ -61,6 +61,7 @@ function updateFormFromEvent(event: CalendarEvent | undefined) {
 
   [form.fromDate, form.fromTime] = dateTimeToIsoDateAndTime(event.from);
   [form.toDate, form.toTime] = dateTimeToIsoDateAndTime(event.to);
+  form.repeatEndOn = event.from.plus({ week: 1 }).toISODate() ?? ''; // the default
 
   if (form.fromTime == '00:00' && form.toTime == '23:59') {
     form.entireDay = true;
@@ -78,7 +79,7 @@ function updateFormFromEvent(event: CalendarEvent | undefined) {
       form.repeatEndAfter = event.repeat.count;
     } else if (event.repeat.until) {
       form.repeatEnd = 'on';
-      form.repeatEndOn = event.repeat.until.toISOTime({ includeOffset: false, precision: 'minute' }) ?? '';
+      form.repeatEndOn = event.repeat.until.toISODate() ?? '';
     } else {
       console.log('Something went wrong with the events repetition. Both Until and Count are undefined or invalid.');
     }

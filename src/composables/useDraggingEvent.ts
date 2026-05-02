@@ -20,10 +20,15 @@ export function useDraggingEvent(timelineRef: Ref<HTMLElement | null>, date: Ref
     return timelineRef.value.clientHeight / numberOfHours() / (60 / settings.value.dragPrecisionMinutes);
   });
 
+  const maxY = computed(() => timelineRef.value?.clientHeight ?? 0);
+
   // mouse Y relative to the top of the timeline, snapped to the grid
   const snappedMouseY = computed(() => {
     if (!timelineRef.value || snapToGridHeight.value === 0) return 0;
-    const relY = Math.max(0, y.value - timelineRef.value.getBoundingClientRect().y);
+
+    let relY = y.value - timelineRef.value.getBoundingClientRect().y;
+    relY = Math.max(0, Math.min(relY, maxY.value));
+
     return Math.round(relY / snapToGridHeight.value) * snapToGridHeight.value;
   });
 

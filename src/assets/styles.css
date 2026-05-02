@@ -144,6 +144,11 @@ label:active > input[type='checkbox']::before {
   transform: translateY(1px);
 }
 
+input.red,
+.datetime.red > input {
+  border: 1px solid var(--git-color);
+}
+
 .modal {
   position: absolute;
   width: 100dvw;

@@ -39,6 +39,10 @@ const form = reactive({
   repeatEndOn: DateTime.now().plus({ week: 1 }).toISODate(),
   repeatEndAfter: 5,
 });
+const errors = reactive({
+  missingName: false,
+  badToDate: false,
+});
 
 const calendarNames = ref([] as string[]);
 
@@ -130,6 +134,7 @@ async function saveEvent(e: Event) {
   e.preventDefault(); // don't refresh page with button type submit
 
   const event = reconstructEvent();
+  if (!validate(event)) return;
 
   let newEvent: CalendarEvent;
   try {
@@ -209,6 +214,20 @@ async function deleteRepeatingEvent(strategy: UpdateStrategy) {
   console.log('deleted repeating event:', event);
 }
 
+function validate(event: CalendarEvent): boolean {
+  if (event.title == '') {
+    errors.missingName = true;
+    return false;
+  }
+
+  if (event.to.diff(event.from).as('milliseconds') < 0) {
+    errors.badToDate = true;
+    return false;
+  }
+
+  return true; // ok
+}
+
 const nameInputField = useTemplateRef('name-input-field');
 onMounted(async () => {
   calendarNames.value = await CalendarCore.listCalendars();
@@ -229,6 +248,8 @@ onMounted(async () => {
         autocomplete="none"
         v-model="form.title"
         ref="name-input-field"
+        :class="{ red: errors.missingName }"
+        @input="errors.missingName = false"
       />
 
       <div class="dates">
@@ -239,9 +260,15 @@ onMounted(async () => {
         </div>
 
         <span>{{ $t('event.to') }}:</span>
-        <div class="datetime">
-          <input type="date" name="to-date" v-model="form.toDate" />
-          <input type="time" name="to-time" v-model="form.toTime" v-if="!form.entireDay" />
+        <div class="datetime" :class="{ red: errors.badToDate }">
+          <input type="date" name="to-date" v-model="form.toDate" @change="errors.badToDate = false" />
+          <input
+            type="time"
+            name="to-time"
+            v-model="form.toTime"
+            v-if="!form.entireDay"
+            @change="errors.badToDate = false"
+          />
         </div>
       </div>
 

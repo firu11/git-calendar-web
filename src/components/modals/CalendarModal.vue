@@ -164,8 +164,4 @@ function urlWithAuth(repoUrl: string, username: string, password: string): strin
     }
   }
 }
-
-input.red {
-  border: 1px solid var(--git-color);
-}
 </style>

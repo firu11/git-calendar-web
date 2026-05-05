@@ -186,6 +186,13 @@ input.red,
     display: flex;
     gap: 1rem;
   }
+
+  @media (max-width: 768px) {
+    align-items: start;
+    form {
+      margin-top: 10%;
+    }
+  }
 }
 
 @media (max-width: 768px) {

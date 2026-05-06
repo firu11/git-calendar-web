@@ -42,8 +42,4 @@ function getEventStylePos(e: CalendarEvent) {
   />
 </template>
 
-<style scoped>
-.timeline-event {
-  cursor: pointer;
-}
-</style>
+<style scoped></style>

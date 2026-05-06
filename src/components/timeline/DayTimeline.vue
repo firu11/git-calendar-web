@@ -73,7 +73,7 @@ const { drag, placeholderTop, placeholderHeight, placeholderSubtitle, dragStart 
     <div class="timeline-grid">
       <!-- placeholder event for dragging -->
       <BaseEvent
-        v-show="drag.active"
+        v-if="drag.active"
         :top-style="placeholderTop"
         :height-style="placeholderHeight"
         :title="$t('event.new')"
@@ -107,6 +107,11 @@ const { drag, placeholderTop, placeholderHeight, placeholderSubtitle, dragStart 
   grid-auto-flow: column;
   height: 100%;
   padding: 0 min(10%, 1rem) 0 4px;
+
+  &:has(.temporary) .timeline-event:hover {
+    filter: none;
+    cursor: ns-resize;
+  }
 }
 
 .timeline-group {

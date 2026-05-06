@@ -78,6 +78,7 @@ const { drag, placeholderTop, placeholderHeight, placeholderSubtitle, dragStart 
         :height-style="placeholderHeight"
         :title="$t('event.new')"
         :subtitle="placeholderSubtitle"
+        :temporary="true"
       />
 
       <!-- real events -->
@@ -105,7 +106,7 @@ const { drag, placeholderTop, placeholderHeight, placeholderSubtitle, dragStart 
   display: grid;
   grid-auto-flow: column;
   height: 100%;
-  padding: 0 min(10%, 1rem) 0 5px;
+  padding: 0 min(10%, 1rem) 0 4px;
 }
 
 .timeline-group {

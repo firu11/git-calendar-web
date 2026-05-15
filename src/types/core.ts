@@ -21,7 +21,7 @@ export interface Repetition {
   exceptions: readonly string[];
 }
 
-// A interface showing all the methods of CalendarCore.
+// Interface showing all the methods of CalendarCore.
 // The response types are all made async (Promise<T>) using Asyncify type.
 export interface CalendarApi {
   createCalendar(name: string, password: string): void;

@@ -70,7 +70,7 @@ const id = (i: number) => `toggle-${uid}-${i}`;
 }
 
 .toggle input[type='radio']:checked + label {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--btn-bg-color-checked);
   opacity: 1;
 }
 
